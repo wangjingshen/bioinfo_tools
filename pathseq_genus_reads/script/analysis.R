@@ -32,7 +32,7 @@ data_pathseq <- read.table(pathseq_tsv, sep="\t")
 data_pathseq <- data_pathseq[ grep("^YP", data_pathseq$V2),]
 data_pathseq$V2 <- gsub("YP:Z:","",data_pathseq$V2)
 
-# 
+# intersect YP between tax_id and pathseq
 tax_id <- read.table(tax_id, sep="\t")
 function_get_tax_id <- function(x){
     list1 <- unlist(str_split(data_pathseq$V2[x], pattern = ",", simplify = F))

@@ -22,3 +22,4 @@ result/
 # 忽略文件
 **/*.rds
 **/*.ipynb
+**/*.pth

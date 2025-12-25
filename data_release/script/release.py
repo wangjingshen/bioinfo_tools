@@ -35,7 +35,7 @@ def cp_fastqs(mapfile_file,outdir):
     prefix_dict = defaultdict(list)
     library_dict = defaultdict(list)
     with open(mapfile_file, 'r') as csvfile:
-        reader = csv.DictReader(csvfile, delimiter='\s+')
+        reader = csv.DictReader(csvfile)
         for row in reader:
             prefix_dict[row['sample']].append(row['prefix'])
             library_dict[row['sample']].append(row['library'])
