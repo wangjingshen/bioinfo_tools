@@ -29,9 +29,6 @@ argv <- add_argument(argv, "--rm_batch_var", default ="sample", help="rm batch v
 argv <- add_argument(argv, "--ndims", default = 10, type = "integer", help="ndims, default: 10")
 argv <- add_argument(argv, "--resolution", default = 0.8, type = "double", help="resolution, default: 0.8")
 argv <- add_argument(argv, "--spatial_vis", default = "F", help = "spatial_vis, default: F")
-argv <- add_argument(argv, "--select_seurat_cluster", default = "0", help="select seurat cluster, default: 0")
-argv <- add_argument(argv, "--select_component", default = "top1", help="select component, default: top1")
-argv <- add_argument(argv, "--select_markers", default = "top1", help="select markers, default: top1")
 argv <- add_argument(argv, "--outdir", default = "outdir", help = "output dir, default: outdir")
 argv <- parse_args(argv)
 
@@ -48,8 +45,7 @@ if (!(length(pxl) == length(sample) && length(sample) == length(group))) {
 if(!dir_exists(outdir)){
     dir_create(outdir, "qc")
     dir_create(outdir, "cluster")
-    #dir.create(str_glue("{outdir}/qc/"), recursive = T)
-    #dir.create(str_glue("{outdir}/cluster/"), recursive = T)
+    dir_create(outdir, "spatial")
 }
 
 # read data --
@@ -121,7 +117,7 @@ pg_data_combined <- pg_data_combined %>%
     FindNeighbors(dims = 1 : argv$ndims, reduction = if(argv$rm_batch == "T") "harmony" else "pca", verbose = F) %>%
     FindClusters(random.seed = 1, resolution = argv$resolution, verbose = F)
 
-# umap plot
+# umap plot --
 function_save_plot <- function(plot_func, file_name, data, h = 5, w = NULL) {
     if (is.null(w)) w <- 7 + 5 * length(unique(data$sample))
     p <- plot_func(data)
@@ -143,44 +139,35 @@ saveRDS(pg_data_combined, str_glue("{outdir}/data.rds"))
 # deg
 deg_clusters <- FindAllMarkers(pg_data_combined, test.use = "wilcox", assay = "PNA", slot = "data", 
                                logfc.threshold = 0, return.thresh = 1, mean.fxn = rowMeans, fc.name = "difference", verbose = F)
+write_tsv(deg_clusters[, c(7,1:6)], file.path(outdir, "cluster", "deg_clusters.tsv"))
 #write.table(deg_clusters[, c(7,1:6)], str_glue("{outdir}/cluster/deg_clusters.tsv"), sep="\t", row.names=F, quote =F)
-write_tsv(deg_clusters, file.path(outdir, "cluster", "deg_clusters.tsv"))
 
-if(argv$spatial_vis %in% c("T","True","TRUE")){
-    if(!dir_exists(str_glue("{outdir}/spatial"))){
-        dir_create(outdir, "spatial")
-    }
-    #if(!dir.exists(str_glue("{outdir}/spatial/"))){
-    #    dir.create(str_glue("{outdir}/spatial/"), recursive = T)
-    #}
+if(argv$spatial_vis){
+    display_cluster = "0"
     # Cell Visualization
-    clustering_scores <- ProximityScores(pg_data_combined, meta_data_columns = c("seurat_clusters"), add_marker_counts = TRUE) %>% 
-        filter(seurat_clusters == argv$select_seurat_cluster) %>% 
-        filter(marker_1 == marker_2)
+    display_component <- ProximityScores(pg_data_combined, meta_data_columns = c("seurat_clusters"), add_marker_counts = TRUE) %>% 
+        filter(seurat_clusters == display_cluster) %>% 
+        filter(marker_1 == marker_2) %>%
+        arrange(-log2_ratio) %>% pull(component) %>% head(1)
 
-    select_component <- ifelse(argv$select_component == "top1",
-                               clustering_scores$component[1],
-                               unlist(strsplit(argv$select_component, split = ",")))
-
-    select_markers <- ifelse(argv$select_markers == "top1", 
-                             deg_clusters %>% filter(cluster == argv$select_seurat_cluster) %>% pull(gene) %>% head(1),
-                             unlist(strsplit(argv$select_markers, split = ",")))
+    display_marker <- deg_clusters %>% 
+        filter(cluster == "0") %>% pull(gene) %>% head(1)
  
     pg_data_combined <- ComputeLayout(pg_data_combined, layout_method = "wpmds")
-    pg_data_combined <- LoadCellGraphs(pg_data_combined, cells = select_component, add_layouts = TRUE, verbose = FALSE)
+    pg_data_combined <- LoadCellGraphs(pg_data_combined, cells = display_component, add_layouts = TRUE, verbose = FALSE)
 
     with_progress({
-        future_walk(select_markers,
+        future_walk(display_marker,
                     function(m) {
-                        p <- Plot2DGraph(pg_data_combined, cells = select_component, marker = m)
+                        p <- Plot2DGraph(pg_data_combined, cells = display_component, marker = m)
                         ggsave(file.path(outdir, "spatial", str_glue("{m}_2D.png")), p, height = 5, width = 6)
                     }, .options = furrr_options(seed = NULL))
     })
 
     with_progress({
-        future_walk(select_markers,
+        future_walk(display_marker,
                     function(m) {
-                        cg <- CellGraphs(pg_data_combined)[[select_component]]
+                        cg <- CellGraphs(pg_data_combined)[[display_component]]
                         xyz <- cg@layout$wpmds_3d %>% mutate(node_val = cg@counts[, m])
                         render_rotating_layout(data = xyz, str_glue("{outdir}/spatial/{m}_3D.gif"), 
                                                max_degree = 180, frames = 200, show_first_frame = FALSE, 
