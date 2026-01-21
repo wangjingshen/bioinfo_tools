@@ -1,0 +1,14 @@
+该脚本用于 napari选取 celescope 空转数据的 spot
+
+conda环境:napari_env
+
+step:
+s1.celescope 空转 outs 转成 spatialdata的 zarr 格式
+参数:
+--space_dir     celescope空转分析目录,例如/SGRNJ06/randd/PROJECT/R25030501_Spatial_FFPE_tgx/20251127/Mint_FFPE_96_96_1119/
+--sample        样本名,例如Mint_FFPE_96_96_1119
+--outdir        输出目录,默认为napari
+
+
+s2.使用 napari 选取感兴趣的区域
+服务器端使用napari有点问题,这一步在本地进行,参照script/napari.py的代码以及blog的2601

@@ -1,0 +1,10 @@
+目前支持单个样本分析
+
+1.run_celescope_cmd
+celescope3.0.0 celescope space sample,starsolo
+celescope2.2.0 celescope pathseq pathseq,count_pathseq,analysis_pathseq 
+
+2.run_celescope
+nohup bash shell/{sample}.sh
+
+3.run_pipeline(seurat_space)
