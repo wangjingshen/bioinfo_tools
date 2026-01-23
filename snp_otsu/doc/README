@@ -1,0 +1,3 @@
+改代码用于celescope snp otsu filter
+
+snpeff注释后的vcf文, get_count_array会遇到 (None,) 的问题, 需要修复为 (0,0)
