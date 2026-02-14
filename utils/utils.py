@@ -3,6 +3,12 @@ import subprocess
 import logging
 import glob
 import os
+import time
+import psutil
+import time
+import functools
+#from functools import wraps
+
 
 
 logging.basicConfig(
@@ -38,3 +44,41 @@ def mkdir(dir) -> None:
         os.makedirs(dir, exist_ok=True)
     except Exception as e:
         logger.error(f"Failed to create directory {dir}: {e}")
+
+
+def run_with_single_thread(command, **kwargs):
+    '''
+    Run the command in single-thread mode without affecting the main process.
+    Enforce single-threading to avoid conflicts with OpenBLAS.
+    '''
+    logger.info(f"Executing: {command} with single thread")
+    env = os.environ.copy()
+    env.update({
+        'OPENBLAS_NUM_THREADS': '1',
+        'MKL_NUM_THREADS': '1',
+        'OMP_NUM_THREADS': '1',
+        'NUMEXPR_NUM_THREADS': '1',
+    })
+
+    try:
+        subprocess.check_call(command, env=env, shell=True)
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Command failed: {command}, error: {e}")
+        raise
+
+    #return subprocess.run(cmd, env=env, **kwargs)
+
+
+def timer(func):
+    '''
+    decorator: measure execution time
+    '''
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        elapsed = time.time() - start
+        logger.info(f"[{func.__name__}] time: {elapsed:.2f}s ({elapsed/60:.2f}min) ({elapsed/60/60:.2f}h) ({elapsed/60/60/24:.2f}d)")
+        return result
+    return wrapper
+

@@ -70,8 +70,7 @@ def main():
 
     # recale image
     locs = locs.astype(float)
-    locs = np.stack([locs['x'], locs['y']], -1)
-    #locs = np.stack([locs['y'], locs['x']], -1)
+    locs = np.stack([locs['y'], locs['x']], -1)
     locs /= factor
     locs = locs.round().astype(int)
     img = reduce(
