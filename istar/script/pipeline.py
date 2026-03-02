@@ -35,7 +35,7 @@ CONFIG = {
 
 
 class IStar:
-    def __init__(self, dir: Path, image: Path, spname: str, swap_pos: str, step: str):
+    def __init__(self, dir: Path, image: Path, spname: str, swap_pos: str, mask_method: str, step: str):
         self.dir = dir
         filtered_dir = os.path.join(dir, "outs", "filtered")
         pos = os.path.join(dir, "outs", "spatial", "positions_list.csv")
@@ -52,6 +52,7 @@ class IStar:
         self.pos = pos
 
         self.swap_pos = swap_pos
+        self.mask_method = mask_method
         self.spname = spname.rstrip("/") + "/"  #  spname+"/"  #istar prefix
         self.step = step.strip().split(',')
 
@@ -98,7 +99,7 @@ class IStar:
         # extract histology features
         execute_cmd(f'python {ROOT}/istar/extract_features.py {self.spname} --device={CONFIG["DEVICE"]}')
         # auto detect tissue mask
-        execute_cmd(f'python {ROOT}/istar/get_mask.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png')
+        execute_cmd(f'python {ROOT}/istar/get_mask.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.mask_method}')
         # select most highly variable genes to predict
         execute_cmd(f'python {ROOT}/istar/select_genes.py --n-top={CONFIG["N_HVG"]} {self.spname}/cnts.tsv {self.spname}/gene-names.txt')
         # rescale coordinates and spot radius
@@ -150,25 +151,21 @@ class IStar:
 
     @timer
     def run(self) -> None:
-        step_order = ['input','preprocess','impute','cluster', 'ln_outs']
+        step_order = ['input', 'preprocess', 'impute', 'cluster', 'ln_outs']
         for step in step_order:
             if step in self.step:
                 getattr(self, step)()
 
 
 def parse_mapfile(mapfile, step):
-    df_mapfile = pd.read_csv(mapfile, sep=r'\s+')
-    df_mapfile['step'] = step
-    dir_list = df_mapfile['dir']
-    image_list = df_mapfile['image']
-    spname_list = df_mapfile['spname']
-    swap_pos_list = df_mapfile['swap_pos']
-    step_list = df_mapfile['step']
-    return dir_list, image_list, spname_list, swap_pos_list, step_list
+    df = pd.read_csv(mapfile, sep=r'\s+')
+    df['step'] = step
+    columns = ['dir', 'image', 'spname', 'swap_pos', 'mask_method', 'step']    
+    return [df[col] for col in columns]
 
-def run_single(dir, image, spname, swap_pos, step):
+def run_single(dir, image, spname, swap_pos, mask_method, step):
     try:
-        runner = IStar(dir, image, spname, swap_pos, step)
+        runner = IStar(dir, image, spname, swap_pos, mask_method, step)
         runner.run()
         logger.info(f'Completed: {spname}')
     except Exception as e:
@@ -178,16 +175,16 @@ def run_single(dir, image, spname, swap_pos, step):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--mapfile', help='tsv:dir<>image<>spname<>swap_pos', required=True)
+    parser.add_argument('--mapfile', help='tsv:dir<>image<>spname<>swap_pos<>mask_method', required=True)
     parser.add_argument('--step', default='input,preprocess,impute,cluster,ln_outs', help='comma-separated step')
     parser.add_argument('--threads', type=int, default=1, help='thread pool size')
     args = parser.parse_args()
 
-    dir_list, image_list, spname_list, swap_pos_list, step_list = parse_mapfile(args.mapfile, args.step)
+    dir_list, image_list, spname_list, swap_pos_list, mask_method_list, step_list = parse_mapfile(args.mapfile, args.step)
     
     logger.info(f"Starting pipeline with {len(dir_list)} samples and {args.threads} thread(s).")
     with ThreadPoolExecutor(max_workers = args.threads) as executor:
-        executor.map(run_single, dir_list, image_list, spname_list, swap_pos_list, step_list)
+        executor.map(run_single, dir_list, image_list, spname_list, swap_pos_list, mask_method_list, step_list)
 
 
 if __name__ == '__main__':

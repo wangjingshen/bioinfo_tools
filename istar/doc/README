@@ -1,2 +1,10 @@
+用于跑istar的流程
+
+
+## update log
+2026.02.28，添加参数mask_method，用于解决mask识别错误问题，有的H&E图会呈现背景差异大的情况
+
+
+
 ## reference
 1.https://github.com/daviddaiweizhang/istar
