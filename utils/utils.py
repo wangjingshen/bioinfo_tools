@@ -8,6 +8,8 @@ import psutil
 import time
 import functools
 #from functools import wraps
+from contextlib import contextmanager
+from pathlib import Path
 
 
 
@@ -82,3 +84,13 @@ def timer(func):
         return result
     return wrapper
 
+
+# Context manager: temporarily switch the working directory
+@contextmanager
+def tmp_chdir(path: Path):
+    origin = Path.cwd()
+    try:
+        os.chdir(path)
+        yield
+    finally:
+        os.chdir(origin)

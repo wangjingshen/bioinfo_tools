@@ -1,0 +1,9 @@
+该流程用于生成 loki 图像和矩阵的编码文件
+
+
+## 参数
+--dir        celescope 空转分析目录
+--spname     样本名
+--hk_genes   管家基因列表
+--sc_h5ad    用于测试 Loki_Decompose 的单转注释好的h5ad, 默认为 None
+--step       要运行的模块, 默认为 'input,loki_encode,loki_finetune_encode', 即全部运行

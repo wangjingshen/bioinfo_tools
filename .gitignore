@@ -14,7 +14,7 @@ env/
 *.swp
 
 # 忽略文件夹
-test*/
+#test*/
 code/
 result/
 .ipynb_checkpoints
