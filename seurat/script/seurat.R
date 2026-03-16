@@ -16,7 +16,7 @@ argv <- add_argument(argv, "--matrix_10X", help = "10X matrix, split by ,")
 argv <- add_argument(argv, "--spname", help = "sample name, split by ,")
 argv <- add_argument(argv, "--gname", help = "group name, split by ,")
 argv <- add_argument(argv, "--rm_batch", default = "F", help="rm batch, T or F. Default: F")
-argv <- add_argument(argv, "--rm_batch_var", help="rm batch var")
+argv <- add_argument(argv, "--rm_batch_var", help="rm batch var. Default: sample")
 argv <- add_argument(argv, "--species", help="species, for annotation")
 argv <- add_argument(argv, "--outdir", default = "outdir", help="outdir, Default: outdir")
 argv <- parse_args(argv)
@@ -31,7 +31,7 @@ if (length(unique(c(length(matrix_10X), length(spname), length(gname)))) > 1) {
 }
 
 rm_batch <- ifelse(is.na(argv$rm_batch), "F", argv$rm_batch)
-rm_batch <- argv$rm_batch_var
+rm_batch_var <- ifelse(is.na(argv$rm_batch_var), "sample", argv$rm_batch_var)   
 species <- argv$species
 
 outdir <- argv$outdir
@@ -43,8 +43,8 @@ if(!dir.exists(outdir)){
 data_seurat_list <- pmap(list(matrix_10X, spname, gname),
     function(dir, sp, gp){
         data <- Read10X(dir) %>%
-            CreateSeuratObject() %>%
-            RenameCells(add.cell.id = sp)
+            CreateSeuratObject() #%>%
+            #RenameCells(add.cell.id = sp)
         data$sample <- sp
         data$group <- gp
         return(data)
@@ -76,7 +76,7 @@ if(rm_batch %in% c("T", "True", "TRUE")){
     my_harmony_embeddings <- HarmonyMatrix(
         data_mat  = as.matrix(Embeddings(data_seurat)),
         meta_data = data_seurat@meta.data,
-        vars_use  = "sample",
+        vars_use  = rm_batch_var,
         do_pca = FALSE)
 
     rownames(my_harmony_embeddings) <- rownames(Embeddings(data_seurat))
