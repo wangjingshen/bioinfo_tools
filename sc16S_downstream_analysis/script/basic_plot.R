@@ -197,5 +197,5 @@ if(!is.na(argv$specific_genus)){
     out <- lapply(specific_genus, function_top10_genus_plot, splitgroup = splitgroup)
 }
 
-file.copy("/SGRNJ06/randd/USER/wangjingshen/script_dev/sc16S_downstream_analysis/doc/basic_plot.txt", str_glue("{outdir}/README.txt"))
+file.copy("/SGRNJ06/randd/USER/wangjingshen/script/sc16S_downstream_analysis/doc/basic_plot.txt", str_glue("{outdir}/README.txt"))
 cat("basic plot done. \n")

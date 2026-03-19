@@ -112,6 +112,6 @@ if(split_group == "T"){
     ggsave(str_glue("{outdir}/shannon_diversity_barplot.pdf"), height = 5, width = 7)
 }
 
-file.copy("/SGRNJ06/randd/USER/wangjingshen/script_dev/sc16S_downstream_analysis/doc/transcriptome_diversity.txt", str_glue("{outdir}/README.txt"))
+file.copy("/SGRNJ06/randd/USER/wangjingshen/script/sc16S_downstream_analysis/doc/transcriptome_diversity.txt", str_glue("{outdir}/README.txt"))
 
 cat("transcriptome diversity done. \n")

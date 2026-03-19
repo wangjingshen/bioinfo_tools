@@ -74,5 +74,5 @@ if(obj == "all"){
 }else{
     res <- function_circos_plot(obj)
 }
-file.copy("/SGRNJ06/randd/USER/wangjingshen/script_dev/sc16S_downstream_analysis/doc/circos.txt", str_glue("{outdir}/README.txt"))
+file.copy("/SGRNJ06/randd/USER/wangjingshen/script/sc16S_downstream_analysis/doc/circos.txt", str_glue("{outdir}/README.txt"))
 cat("circos plot done. \n")

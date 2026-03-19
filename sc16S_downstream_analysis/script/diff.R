@@ -118,5 +118,5 @@ if(mode == "cluster"){
     }
 }
 
-file.copy("/SGRNJ06/randd/USER/wangjingshen/script_dev/sc16S_downstream_analysis/doc/diff.txt", str_glue("{outdir}/README.txt"))
+file.copy("/SGRNJ06/randd/USER/wangjingshen/script/sc16S_downstream_analysis/doc/diff.txt", str_glue("{outdir}/README.txt"))
 cat("diff done. \n")
