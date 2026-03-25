@@ -1,16 +1,6 @@
 import os
-os.environ['OMP_NUM_THREADS'] = '32'
-os.environ['MKL_NUM_THREADS'] = '32'
-#os.environ['OPENBLAS_NUM_THREADS'] = '1'
-#os.environ['NUMEXPR_NUM_THREADS'] = '1'
 import sys
-import pandas as pd
 import argparse
-import glob
-import subprocess
-import logging
-import json
-import psutil
 
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
@@ -21,15 +11,6 @@ dev_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(dev_root))
 from istar2spots import istar2spots
 from utils.utils import mkdir, logger, execute_cmd, timer, run_with_single_thread
-
-CONFIG = {
-    "DEVICE": "cpu",  # or "cuda"
-    "PixelSize": 0.5,
-    "N_HVG": 1000,
-    "EPOCHS": 400,
-    "FilterSize": 8,
-    "MinClusterSize": 20,
-}
 
 
 class IStarSpots:
@@ -87,9 +68,9 @@ def main():
     parser.add_argument('--istar_labels', help='istar labels pickle', required=True)
     parser.add_argument('--dir', help='celescope dir', required=True)
     parser.add_argument('--spname', help='spname', required=True)
-    parser.add_argument('--k', default = 3, type = int, help='k istar pixels')
-    parser.add_argument('--distance_thresh', default=200, type = int, help='thresh of distance between spots and istar pixels')
-    parser.add_argument('--clip', action='store_true', help='clip spots from istar') 
+    parser.add_argument('--k', help='k istar pixels', default = 3, type = int)
+    parser.add_argument('--distance_thresh', help='thresh of distance between spots and istar pixels', default=200, type = int)
+    parser.add_argument('--clip', help='clip spots from istar', action='store_true') 
     args = parser.parse_args()
 
     runner = IStarSpots(args.istar_labels, args.dir, args.spname, args.k, args.distance_thresh, args.clip)

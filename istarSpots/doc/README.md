@@ -1,18 +1,24 @@
-该流程用于把 istar 的分群迁移到 spot 上,并输出文件用于后续分析。
+### istarSpots
+该流程用于把 istar 的分群迁移到 spot 上, 并输出文件用于后续分析。
 
 
-## 图像里的行列
-图像里的「行 / 列」和数学里不一样
-在图片、像素、空间转录组里：
-col（列）= 左右方向 = 水平 = X 轴
-row（行）= 上下方向 = 垂直 = Y 轴
-这是图像行业的标准规则
+### parameters
+--istar_labels        istar labels pickle
+
+--dir                 celescope dir
+
+--spname              spname
+
+--k                   k istar pixels, default = 3, type = int
+
+--distance_thresh     threshold of distance between spots and istar pixels, default=200, type = int
+
+--clip                clip spots from istar, store_true
 
 
-(左)  col → 水平增加（X）
-      ↓
-row ↑ 像素(0,0)  像素(0,1)  像素(0,2)  → 右
-|     像素(1,0)  像素(1,1)  像素(1,2)
-↓     像素(2,0)  像素(2,1)  像素(2,2)
-(上)
-垂直（Y）
+### note
+在图片、像素、空间转录组里, 行 / 列与数学里不一样, 
+
+列（col）= 左右方向 = 水平 = X 轴
+
+行（row）= 上下方向 = 垂直 = Y 轴
