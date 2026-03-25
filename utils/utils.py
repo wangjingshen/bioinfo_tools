@@ -6,6 +6,7 @@ import os
 import time
 import psutil
 import time
+import pickle
 #import functools
 from functools import wraps
 from contextlib import contextmanager
@@ -95,3 +96,18 @@ def tmp_chdir(path: Path):
         yield
     finally:
         os.chdir(origin)
+
+
+def save_pickle(x, filename):
+    mkdir(filename)
+    with open(filename, 'wb') as file:
+        pickle.dump(x, file)
+    print(filename)
+
+
+def load_pickle(filename, verbose=True):
+    with open(filename, 'rb') as file:
+        x = pickle.load(file)
+    if verbose:
+        print(f'Pickle loaded from {filename}')
+    return x
