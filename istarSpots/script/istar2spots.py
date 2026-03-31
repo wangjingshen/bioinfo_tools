@@ -74,7 +74,7 @@ def istar2spots(istar_lables, spots_pos, outdir, k, distance_thresh, clip):
     plt.gca().invert_yaxis()  # 
     plt.colorbar(shrink=0.7)
     plt.axis("off")
-    plt.title("iSTAR", fontsize=13)
+    plt.title("istar", fontsize=13)
     plt.savefig(f"{outdir}/istar2spots.png", dpi=300, bbox_inches="tight", pad_inches=0)
     plt.close()
 
