@@ -78,6 +78,24 @@ def istar2spots(istar_lables, spots_pos, outdir, k, distance_thresh, clip):
     plt.savefig(f"{outdir}/istar2spots.png", dpi=300, bbox_inches="tight", pad_inches=0)
     plt.close()
 
+    # plt imshow
+    plt.figure(figsize=(9, 8))
+    plt.imshow(istar_cluster, cmap="tab20", alpha=0.2, origin="upper")  # show istar raw plot 
+    plt.scatter(
+        valid["x"], valid["y"],
+        c=valid["cluster"],
+        cmap="tab10",
+        s=12,
+        edgecolor="black",
+        lw=0.2
+    )
+    plt.colorbar(shrink=0.7)
+    plt.axis("off")
+    plt.title("istar", fontsize=13)
+    plt.savefig(f"{outdir}/istar2spots_bg.png", dpi=300, bbox_inches="tight", pad_inches=0)
+    plt.close()
+
+
     result_df = spot_coords[["barcode", "cluster"]].copy()
     result_df.columns = ["barcode", "istar_cluster"]
     result_df.to_csv(f'{outdir}/istar2spots_df.csv', index=False)
