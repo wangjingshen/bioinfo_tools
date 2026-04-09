@@ -40,16 +40,16 @@ def istar2spots(istar_lables, spots_pos, outdir, k, distance_thresh, clip):
     istar_cluster = load_pickle(istar_lables)  # (1008, 1008)
     spot_coords = pd.read_csv(spots_pos, header=None,
         names=["barcode", "in_tissue", "array_row", "array_col", "pxl_row", "pxl_col"])  # "pxl_col", "pxl_row"
-    spot_coords = spot_coords[spot_coords["in_tissue"] == 1].reset_index(drop=True)
+    #spot_coords = spot_coords[spot_coords["in_tissue"] == 1].reset_index(drop=True) # some tissue pictures are not completely covered with spots. Filtering ahead will cause incorrect scaling.
 
-    # scale 1008*1008
+    # scale to istar(1008*1008)
     spot_coords["pxl_col_abs"] = spot_coords["pxl_col"] - spot_coords["pxl_col"].min()
     spot_coords["pxl_row_abs"] = spot_coords["pxl_row"] - spot_coords["pxl_row"].min()
-    scale_col = 1008 / spot_coords["pxl_col_abs"].max()
-    scale_row = 1008 / spot_coords["pxl_row_abs"].max()
-    spot_coords["x"] = (spot_coords["pxl_col_abs"] * scale_col).astype(int)
-    spot_coords["y"] = (spot_coords["pxl_row_abs"] * scale_row).astype(int)
+    scale_factor = 1008 / max(spot_coords["pxl_col_abs"].max(), spot_coords["pxl_row_abs"].max())
+    spot_coords["x"] = (spot_coords["pxl_col_abs"] * scale_factor) #.astype(int)
+    spot_coords["y"] = (spot_coords["pxl_row_abs"] * scale_factor) #.astype(int)
 
+    spot_coords = spot_coords[spot_coords["in_tissue"] == 1].reset_index(drop=True)  
     y, x = np.where(istar_cluster != -1)
     istar_coords = np.column_stack([x, y])
     istar_labels = istar_cluster[y, x]
@@ -62,15 +62,7 @@ def istar2spots(istar_lables, spots_pos, outdir, k, distance_thresh, clip):
     valid = spot_coords[spot_coords["cluster"] != -1]
 
     plt.figure(figsize=(9, 8))
-    #plt.imshow(istar_cluster, cmap="tab20", alpha=0.2, origin="upper")  # show istar raw plot 
-    plt.scatter(
-        valid["x"], valid["y"],
-        c=valid["cluster"],
-        cmap="tab10",
-        s=12,
-        edgecolor="black",
-        lw=0.2
-    )
+    plt.scatter(valid["x"], valid["y"], c=valid["cluster"], cmap="tab10", s=12, edgecolor="black", lw=0.2)
     plt.gca().invert_yaxis()  # 
     plt.colorbar(shrink=0.7)
     plt.axis("off")
@@ -81,14 +73,7 @@ def istar2spots(istar_lables, spots_pos, outdir, k, distance_thresh, clip):
     # plt imshow
     plt.figure(figsize=(9, 8))
     plt.imshow(istar_cluster, cmap="tab20", alpha=0.2, origin="upper")  # show istar raw plot 
-    plt.scatter(
-        valid["x"], valid["y"],
-        c=valid["cluster"],
-        cmap="tab10",
-        s=12,
-        edgecolor="black",
-        lw=0.2
-    )
+    plt.scatter(valid["x"], valid["y"], c=valid["cluster"], cmap="tab10", s=12, edgecolor="black", lw=0.2)
     plt.colorbar(shrink=0.7)
     plt.axis("off")
     plt.title("istar", fontsize=13)
@@ -115,7 +100,7 @@ def main():
     parser.add_argument('--istar_labels', help='istar labels pickle', required=True)
     parser.add_argument('--space_pos', help='space positions', required=True)
     parser.add_argument('--outdir', help='outdir', required=True)
-    parser.add_argument('--k', default = 3, type = int, help='k istar pixels')
+    parser.add_argument('--k', default = 5, type = int, help='k istar pixels')
     parser.add_argument('--distance_thresh', default=200, type = int, help='thresh of distance between spots and istar pixels')
     parser.add_argument('--clip', action='store_true', help='clip spots from istar') 
     args = parser.parse_args()

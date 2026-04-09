@@ -17,6 +17,7 @@ argv <- add_argument(argv, "--spname", help = "sample name, split by ,")
 argv <- add_argument(argv, "--gname", help = "group name, split by ,")
 argv <- add_argument(argv, "--rm_batch", default = "F", help="rm batch, T or F. Default: F")
 argv <- add_argument(argv, "--rm_batch_var", help="rm batch var. Default: sample")
+argv <- add_argument(argv, "--resolution", help="resolution. Default: 0.3")
 argv <- add_argument(argv, "--species", help="species, for annotation")
 argv <- add_argument(argv, "--outdir", default = "outdir", help="outdir, Default: outdir")
 argv <- parse_args(argv)
@@ -31,7 +32,8 @@ if (length(unique(c(length(matrix_10X), length(spname), length(gname)))) > 1) {
 }
 
 rm_batch <- ifelse(is.na(argv$rm_batch), "F", argv$rm_batch)
-rm_batch_var <- ifelse(is.na(argv$rm_batch_var), "sample", argv$rm_batch_var)   
+rm_batch_var <- ifelse(is.na(argv$rm_batch_var), "sample", argv$rm_batch_var)
+resolution <- ifelse(is.na(argv$resolution), 0.3, argv$resolution)   
 species <- argv$species
 
 outdir <- argv$outdir
@@ -85,7 +87,7 @@ if(rm_batch %in% c("T", "True", "TRUE")){
 
 data_seurat <- data_seurat %>%
     FindNeighbors(reduction = ifelse(rm_batch %in% c("T", "True", "TRUE"), "harmony", "pca"), dims = 1:20, verbose = F) %>%
-    FindClusters(resolution = 1, verbose = F) %>%
+    FindClusters(resolution = resolution, verbose = F) %>%
     RunTSNE(reduction = ifelse(rm_batch %in% c("T", "True", "TRUE"), "harmony", "pca"), dims = 1:20, do.fast = TRUE, check_duplicates = FALSE, verbose = F) %>%
     RunUMAP(reduction = ifelse(rm_batch %in% c("T", "True", "TRUE"), "harmony", "pca"), dims = 1:20, verbose = F)
 
