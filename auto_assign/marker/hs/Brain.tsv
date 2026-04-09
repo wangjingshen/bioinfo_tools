@@ -1,0 +1,23 @@
+celltype	marker
+Oligodendrocytes	OLIG1,OLIG2,MBP,MOG,MAG,CNP
+Astrocytes	GFAP,AQP4,ALDOC,SLC1A3
+Schwann cells	S100B,CRYAB,MPZ
+Microglial cells	P2RY12,CX3CR1
+Macrophages	LYZ,CD14,CD68
+Pericytes	RGS5,ACTA2,PDGFRB
+Neurons	SYT1,SNAP25,GRIN1
+Anterior pituitary gland cells	GH1,GH2,POU1F1,EPCAM1
+Choroid plexus cells	TTR, SOSTDC1,KL
+Fibroblasts	LUM,DCN,COL1A2,COL1A1
+Pericytes	RGS5,ACTA2,MCAM,PDGFRB
+Smooth muscle cells	ACTA2,TAGLN,MYLK
+T cells	CD2,CD3D,TRAC,TRBC2
+NK cells	KLRD1,NKG7,KLRC1,FCGR3A
+B cells	MS4A1,CD79A,CD79B
+Plasma cells	CD79A,JCHAIN,MZB1,IGHG1
+Dendritic cells	LYZ,XCR1,CLEC9A,THBD,CD1C,CD1E,FCER1A
+Macrophages	LYZ,CD68,MRC1,C1QA,C1QB,CD163
+Plasmacytoid dendritic cells(pDC)	IL3RA,CLEC4C,LILRB4,LILRA4
+Mast cells	TPSAB1,TPSB2,CPA3
+Neutrophils	CSF3R,CXCR2,FCGR3B
+Erythrocytes	HBB,HBA1,ALAS2,SNCA,CA1

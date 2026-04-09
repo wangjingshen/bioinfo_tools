@@ -1,0 +1,19 @@
+celltype	marker
+Pericytes	RGS5,ACTA2,MCAM,PDGFRB
+Smooth muscle cells	ACTA2,TAGLN,MYLK
+Fibroblasts	LUM,DCN,COL1A2,COL1A1
+Endothelial cells	CDH5,PECAM1,VWF
+Gastric epithelial cells	EPCAM,CDH1
+Goblet cells	MUC2,ITLN1
+Chief cells	PGA3,PAG4,LIPF
+Pit_mucous_cells(PMC)	MUC5AC,TFF1
+Mucous neck cells	MUC6,TFF2
+Gland_mucous_cell (GMC)	MUC6,TFF2
+parietal cells/oxyntic cells	ATP4A,ATP4B
+Enteroendocrine cells 	CHGA,CHGB
+T cells	CD2,CD3D,TRAC,TRBC2
+NK cells	KLRD1,NKG7,KLRC1,FCGR3A
+B cells	MS4A1,CD79A,CD79B
+Plasma cells	CD79A,JCHAIN,MZB1,IGHG1
+Myeloid cells	LYZ,MNDA
+Erythrocytes	HBB,HBA1,ALAS2,SNCA,CA1

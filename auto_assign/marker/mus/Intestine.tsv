@@ -1,0 +1,21 @@
+celltype	marker
+Pericytes	Rgs5,Acta2,Mcam,Pdgfrb
+Smooth muscle cells	Acta2,Tagln,Mylk
+Fibroblasts	Lum,Dcn,Col1a2,Col1a1
+Endothelial cells	Cdh5,Pecam1,Vwf
+Intestinal stem cells	Olfm4,Lgr5,Ascl2,Slc12a2,Alcam,Cd24,Sox4
+epithelial progenitor	Epcam,Olfm4,Pmor1,Hes1
+Tuft cells	Ptgs1,Trpm5,Lrmp,Dclk1
+Enterocytes	Vil1,Alpi,Apoa4,Krt20,Epcam
+Paneth cells	Lyz,Ang4,Defa5,Defa6,Defa17,Defa22
+Goblet cells 	Tff3, Muc2, Wfdc2,Itln1
+Enteroendocrine cells	Chga,Chgb,Pyy,Reg4,Gcg,Syt1
+Transit amplifying cells (TA) 	Mki67,Top2a,Epcam
+Microfold cells(M-cells)	Ccl20,Ccl23,Spib,Epcam
+Schwann cells	S100b,Cryab,Mpz
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a
+B cells	Ms4a1,Cd79a,Cd79b
+Plasma cells	Cd79a,Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz,Mnda
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1

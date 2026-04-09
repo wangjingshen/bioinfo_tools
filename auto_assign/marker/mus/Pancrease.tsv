@@ -1,0 +1,14 @@
+celltype	marker
+Epithelial cells	Epcam,Cdh1
+Acinar cells	Prss1, Ctrb1, Ctrb2
+Endocrine cells	Chgb, Chga, Ins, Iapp, Pcsk1
+Endothelial cells	Cdh5,Pecam1,Vwf
+quiescent stellate cells	Rgs5,Acta2,Pdgfrb,Adirf,Des,Gfap
+Fibroblasts	Lum,Dcn,Col1a2,Col1a1
+Smooth muscle cells	Acta2,Tagln,Mylk
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a
+B cells	Ms4a1,Cd79a,Cd79b
+Plasma cells	Cd79a,Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz,Mnda
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1

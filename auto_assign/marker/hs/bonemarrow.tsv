@@ -1,0 +1,24 @@
+celltype	marker
+Hematopoietic stem cells	MEIS1,MSI2,CD34,HOPX,EGR1
+Erythroid progenitor cells	GATA1,TFRC,BLVRB,GYPA,SPTA1
+Megakaryocyte erythroid progenitor cells	PF4,PPBP,ITGA2B,GATA1,GYPA
+Megakaryocyte progenitor cells	PF4,PPBP,ITGA2B,PECAM1
+Promonocyte	LYZ,IRF8,MNDA
+Monocytes	CD14,FCN1
+Granulocyte-macrophage progenitor	LYZ,MPO, ELANE, AZU1
+Neutrophil progenitor cells	CSF3R,MPO, ELANE, AZU1
+Progenitor_B cell	VPREB1,CD34,CD79A,MS4A1,BANK1
+Mature_B_cell	CD79A,MS4A1,BANK1
+plasma_cells	CD79A,MZB1,IGHG1,JCHAIN,IGLL5
+T cells	CD2,CD3D,TRAC,TRBC2
+NK cells	KLRD1,NKG7,KLRC1,FCGR3A
+Conventional type 2 dendritic cells	LYZ,CD1C,FCER1A
+Plasmacytoid dendritic cells	IL3RA,CLEC4C,LILRB4,LILRA4
+Endothelial cells	CDH5,CLDN5,PECAM1,VWF
+Pericytes 	RGS5,ACTA2,MCAM,PDGFRB,NOTCH3
+Adipocytes	ADIPOR1,ADIPOR2
+mature osteoblasts	BGLAP,ALPL,POSTN,COL1A1
+early osteoprogenitors	RUNX2,CXCL12,SP7,KITLG
+late osteoprogenitors	RUNX2,CD200,SPP1
+Chondrocytes	ACAN,COL2A1,COL11A2
+mesenchymal stem cells	NT5E,VCAM1,THY1,ENG

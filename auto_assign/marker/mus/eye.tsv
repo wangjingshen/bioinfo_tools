@@ -1,0 +1,22 @@
+celltype	marker
+Epithelial cells	Epcam,Cdh1
+Microglia	Tmem119,P2ry12,Cx3cr1
+Muller glial cells	Rlbp1,Dkk3,Ca2,Glul
+Astrocytes	Gfap,Aqp4,Aldoc,Slc1a3
+Schwann cells	S100b,Mbp,Mag,Plp1
+Rod photoreceptor cells	Gngt1,Cngb1,Gnat1,Nrl,Nr2e3,Pde6a,Rho,Pde6b
+Cone photoreceptor cells	Arr3,Guca1c,Ped6c,Pde6h
+Amacrine cells	Gad1,Gad2,Tacr1,Slc6a9
+Retinal ganglion cells	Pou4f1,Pou4f2,Nefm,Nefl
+Bipolar cells	Vsx1,Cabp5,Kcng4,Crm6,Lhx4
+Melanocytes	Pmel,Mlana
+Horizontal cells	Foxn4,Ptf1a,Ntrk1,Onecut2
+Smooth muscle cells	Acta2,Tagln,Mylk
+Endothelial cells	Cdh5,Pecam1,Vwf
+Fibroblasts	Lum,Dcn,Col1a2,Col1a1
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a
+B cells	Ms4a1,Cd79a,Cd79b
+Plasma cells	Cd79a,Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz,Mnda
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1

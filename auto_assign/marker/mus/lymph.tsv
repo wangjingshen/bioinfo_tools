@@ -1,0 +1,33 @@
+cell type	marker
+T cells	Cd2,Cd3D/E/G,Trac,Trbc1
+γδT cells	Cd3D/E/G,Trdc,Trgc1,Trgc2
+Naïve T cells/central memory T cells	Cd3D,Ccr7,Lef1,Sell,Tcf7,Il7R
+CD8+ effector T cells	Cd3D,Cd8A/B,Nkg7,Gzma,Gnly
+CD8+ exhuasted T cells	Cd3D,Cd8A/B,Lag3,Ctla4,Tigit,Gnly,Prf1
+CD4+ regulatory T cells	Cd3D,Foxp3,Il2Ra,Ctla4,Ikzf2
+CD4 tissue resident T cells	Cd3D, Cd4,Itgae,Itga1
+CD8 tissue resident T cells	Cd3D, Cd8A,Itgae,Itga1
+NK cells	Cd3D-,Klrd1,Nkg7,Klrc1,Fcgr3A
+B cells	Ms4A1,Cd79A,Cd79B
+Plasma cells	Cd79A,Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz,Mnda
+Classical monocytes	Lyz,Cd14,Fcn1,Vcan,Fcgr3A-
+Non-Classical monocytes	Lyz,Fcgr3A,Ifitm3,Cd14-
+Macrophages	Lyz,Mrc1,Cd68,Cd163,C1Qc
+M1 macrophages	Lyz,Cd68,Il1B,Il6,Tnf
+M2 macrophages	Lyz,Mrc1,Cd163,Tgfb1,Il10,Fn1
+Conventional type 1 dendritic cell 	Xcr1,Clec9A,Thbd 
+Conventional type 2 dendritic cell 	Cd1C,Cd1E,Fcer1A
+Langerhans cells	Cd207,Cd1A
+Plasmacytoid dendritic cells	Gzmb,Il3Ra,Clec4C,Lilrb4
+Mature dendritic cells	Lyz,Lamp3,Ccr7
+Mast cells	Tpsab1,Tpsb2,Cpa3
+Neutrophils	Lyz,Csf3R,Cxcr2,Fcgr3B,Camp,Lcn2
+Neutrophil progenitors	Lyz,Azu1,Mpo,Elane
+Eosinophils	Lyz,Clc
+Basophils	Lyz,Clc,Gata2,Cpa3,Ms4A2
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1
+Pericytes	Rgs5,Acta2,Mcam,Pdgfrb
+Smooth muscle cells	Acta2,Tagln,Mylk,Myh11
+Fibroblasts	Dcn,Col1A2,Col1A1
+Endothelial cells	Cdh5,Pecam1,Vwf,Cldn5

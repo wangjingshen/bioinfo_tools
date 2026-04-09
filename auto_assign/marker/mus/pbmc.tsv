@@ -1,0 +1,8 @@
+celltype	marker
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a
+monocytes	Cd14,Fcn1,Vcan, Fcgr3a, Ifitm3
+Dendritic cells	Cd1c,Cd1e,Fcer1a
+B cells	Ms4a1,Cd79a,Cd79b,Ighd,Hla-dra
+Plasma cells	Jchain,Mzb1,Ighg1
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1

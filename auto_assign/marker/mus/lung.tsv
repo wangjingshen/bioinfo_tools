@@ -1,0 +1,12 @@
+celltype	marker
+Pericytes	Rgs5,Acta2,Mcam,Pdgfrb
+Smooth muscle cells	Acta2,Tagln,Mylk
+Fibroblasts	Lum,Dcn,Col1a2,Col1a1
+Endothelial cells	Cdh5,Pecam1,Vwf
+Epithelial cells	Epcam,Cdh1
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a,Cd3d,Cd3g
+B cells	Ms4a1,Cd79a,Cd79b
+Plasma cells	Cd79a,Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz,Mnda
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1

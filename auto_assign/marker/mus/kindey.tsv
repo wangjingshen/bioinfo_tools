@@ -1,0 +1,20 @@
+celltype	marker
+Pericytes	Rgs5,Acta2,Mcam,Pdgfrb
+Smooth muscle cells	Acta2,Tagln,Mylk
+Fibroblasts	Lum,Dcn,Col1a2,Col1a1
+Endothelial cells	Cdh5,Pecam1,Vwf
+Epithelial cells	Epcam,Cdh1
+Podocytes	Nphs2,Podxl,Ptpro
+Mesangial cells	Vcam1,Fn1,Ctgf
+Proximal tubule cells	Cubn,Slc13a1,Lrp2,Aldob
+Loop of Henle cells	Umod,Slc12a1,Cldn16
+Distal tubule cells	Calb1,Trpm6,Slc12a3
+Collecting tubule cells	Tmem213,Pvalb,Clnk
+Pelvic epithelial cells	Saa2,S100p
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a
+NK T cells	Cd3d,Cd3g,Klrd1,Nkg7,Klrc1,Fcgr3a
+B cells	Ms4a1,Cd79a,Cd79b
+Plasma cells	Cd79a,Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz,Mnda
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1

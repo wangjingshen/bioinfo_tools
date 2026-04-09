@@ -1,0 +1,16 @@
+celltype	marker
+Mesenchymal progenitor cells	Pdgfra,Pdgfrb,Sca1,Thy1
+Adipose stem cells	Mgp,Apod,Cxcl14,Wisp2
+Adipocyte progenitor cells 	Apoe, Fabp4, Cebpb,Cd36
+Adipocytes	Adipoq,Plin1,Car3,Adipor1,Fabp4
+Neural crest cells	Mbp,Plp1
+Pericytes	Rgs5,Acta2,Mcam,Pdgfrb
+Smooth muscle cells	Acta2,Tagln,Mylk
+Fibroblasts	Lum,Dcn,Col1a2,Col1a1
+Endothelial cells	Cdh5,Pecam1,Vwf
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a
+B cells	Ms4a1,Cd79a,Cd79b
+Plasma cells	Cd79a,Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz,Mnda
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1

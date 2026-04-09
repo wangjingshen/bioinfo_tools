@@ -1,0 +1,15 @@
+celltype	marker
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a
+NK T cells	Cd3d,Cd3g,Klrd1,Nkg7
+B cells	Ms4a1,Cd79a,Cd79b,Ighd,Hla-dra
+Plasma cells	Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz
+monocytes	Cd14,Fcn1,Vcan,Fcgr3a,Aif1,Ifitm3
+dendritic cells	Cd1c,Cd1e,Fcer1a
+Neutrophils	Csf3r,Cxcr2,Fcgr3b
+Eosinophils	Clc
+Basophils	Clc,Cpa3,Enpp3,Gata2
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1
+
+

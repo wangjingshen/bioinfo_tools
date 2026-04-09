@@ -1,0 +1,34 @@
+cell type	marker
+T cells	CD2,CD3D/E/G,TRAC,TRBC1
+γδT cells	CD3D/E/G,TRDC,TRGC1,TRGC2
+Naïve T cells/central memory T cells	CD3D,CCR7,LEF1,SELL,TCF7,IL7R
+CD8+ effector T cells	CD3D,CD8A/B,NKG7,GZMA,GNLY
+CD8+ exhuasted T cells	CD3D,CD8A/B,LAG3,CTLA4,TIGIT,GNLY,PRF1
+CD4+ regulatory T cells	CD3D,FOXP3,IL2RA,CTLA4,IKZF2
+CD4 tissue resident T cells	CD3D, CD4,ITGAE,ITGA1
+CD8 tissue resident T cells	CD3D, CD8A,ITGAE,ITGA1
+NK cells	CD3D-,KLRD1,NKG7,KLRC1,FCGR3A
+B cells	MS4A1,CD79A,CD79B
+Plasma cells	CD79A,JCHAIN,MZB1,IGHG1
+Myeloid cells	LYZ,MNDA
+Classical monocytes	LYZ,CD14,FCN1,VCAN,FCGR3A-
+Non-Classical monocytes	LYZ,FCGR3A,IFITM3,CD14-
+Macrophages	LYZ,MRC1,CD68,CD163,C1QC
+M1 macrophages	LYZ,CD68,IL1B,IL6,TNF
+M2 macrophages	LYZ,MRC1,CD163,TGFB1,IL10,FN1
+Conventional type 1 dendritic cell 	XCR1,CLEC9A,THBD 
+Conventional type 2 dendritic cell 	CD1C,CD1E,FCER1A
+Langerhans cells	CD207,CD1A
+Plasmacytoid dendritic cells	GZMB,IL3RA,CLEC4C,LILRB4
+Mature dendritic cells	LYZ,LAMP3,CCR7
+Mast cells	TPSAB1,TPSB2,CPA3
+Neutrophils	LYZ,CSF3R,CXCR2,FCGR3B或LYZ,CAMP,LCN2
+Neutrophil progenitors	LYZ,AZU1,MPO,ELANE
+Eosinophils	LYZ,CLC
+Basophils	LYZ,CLC,GATA2,CPA3,MS4A2
+Erythrocytes	HBB,HBA1,ALAS2,SNCA,CA1
+Pericytes	RGS5,ACTA2,MCAM,PDGFRB
+Smooth muscle cells	ACTA2,TAGLN,MYLK,MYH11
+Fibroblasts	DCN,COL1A2,COL1A1
+Endothelial cells	CDH5,PECAM1,VWF,CLDN5
+

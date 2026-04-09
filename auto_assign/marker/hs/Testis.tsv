@@ -1,0 +1,14 @@
+celltype	marker
+Germ cell	DDX4,MAGEA4
+Leydig cells	INHBA,INSL3
+Sertoli cells	WT1,SOX9,CLDN11
+Endothelial cells	CDH5,PECAM1,VWF
+Fibroblasts	LUM,DCN,COL1A2,COL1A1
+Myoid	ACTA2,TAGLN,MYLK
+Pericytes	RGS5,ACTA2,MCAM,PDGFRB
+T cells	CD2,CD3D,TRAC,TRBC2
+NK cells	KLRD1,NKG7,KLRC1,FCGR3A
+B cells	MS4A1,CD79A,CD79B
+Plasma cells	JCHAIN,MZB1,IGHG1
+Myeloid cells	LYZ,MNDA
+Erythrocytes	HBB,HBA1,ALAS2,SNCA,CA1

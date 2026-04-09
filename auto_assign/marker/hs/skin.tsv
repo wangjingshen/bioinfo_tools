@@ -1,0 +1,16 @@
+celltype	marker
+B cells	MS4A1,CD79A,CD79B,IGHD,HLA-DRA
+Basal keratinocytes	KRT14,KRT5,COL17A1
+T cells	CD2,CD3D,CD3E,CD3G,TRAC,TRBC2
+Endothelial cells	CDH5,CLDN5,PECAM1,VWF
+Fibroblasts	LUM,DCN,COL1A2,COL1A1
+Smooth muscle cells	DES,RGS5,ACTA2,TAGLN,MYLK
+Secretory cells	SCGB1B2P
+plasma cells	JCHAIN,MZB1,IGHG1,IGKC,SLAMF7
+NK cells	KLRD1,NKG7,KLRC1,FCGR3A
+Myeloid cells	FCER1G
+Melanocytes	PMEL,MLANA
+Mast cells	TPSAB1
+Keratinocytes	KRT1,KRT14
+Langerhans cells	CD1A
+Dendritic cells	cDC1,cDC2,FLT3

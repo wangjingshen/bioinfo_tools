@@ -1,0 +1,15 @@
+celltype	marker
+Epithelial cells	Epcam,Cdh1,Krt8
+Granulosa cells	Amh, Hsd17b1, Serpine2, Gsta1,Cyp11a1,Star
+Theca cells	Pth1,Apod,Apoc1,Wfdc1,Matn2,Colec11
+Oocyte	Zp2,Ddx4,Sycp3,Sox30,Zar1,Dazl,Ybx2,Lhx8
+Pericytes	Rgs5,Acta2,Mcam,Pdgfrb
+Smooth muscle cells	Acta2,Tagln,Mylk
+Fibroblasts	Lum,Dcn,Col1a2,Col1a1
+Endothelial cells	Cdh5,Pecam1,Vwf,Cldn5
+T cells	Cd2,Cd3d,Trac,Trbc2
+NK cells	Klrd1,Nkg7,Klrc1,Fcgr3a
+B cells	Ms4a1,Cd79a,Cd79b
+Plasma cells	Cd79a,Jchain,Mzb1,Ighg1
+Myeloid cells	Lyz,Mnda
+Erythrocytes	Hbb,Hba1,Alas2,Snca,Ca1

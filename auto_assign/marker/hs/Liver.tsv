@@ -1,0 +1,16 @@
+celltype	marker
+Hepatocytes	ALB,APOB,APOC1,HP,AFP
+Epithelial progenitors	EPCAM,CDH1,ALB,KRT19
+Cholangiocytes	KRT7,KRT19,MMP7,CFTR,EPCAM
+Endothelial cells	CDH5,CLDN5,PECAM1,VWF
+Smooth muscle cells	MYH11,TAGLN,ACTA2
+Hepatic stellate cells	ACTA2,RGS5,PDGFRB
+Fibroblasts	LUM,DCN,COL1A2,COL1A1
+T cells	CD2,CD3D,TRAC,TRBC2
+NK cells/innate lymphoid cell(ILC)	KLRD1,NKG7,KLRC1,FCGR3A,FGFBP2
+NK T cells	CD3D,CD3G,KLRD1,NKG7,KLRC1,FCGR3A
+B cells	MS4A1,CD79A,CD79B
+Plasma cells	CD79A,JCHAIN,MZB1,IGHG1
+Kupffer cells	CD163,VSIG4,MARCO,TIMD4
+Myeloid cells	LYZ,MNDA
+Erythrocytes	HBB,HBA1,ALAS2,SNCA,CA1
