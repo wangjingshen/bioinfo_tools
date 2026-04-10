@@ -72,6 +72,17 @@ def run_with_single_thread(command, **kwargs):
     #return subprocess.run(cmd, env=env, **kwargs)
 
 
+def format_time(seconds):
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    if h > 0:
+        return f"{h:.0f}h {m:.0f}m {s:.2f}s"
+    elif m > 0:
+        return f"{m:.0f}m {s:.2f}s"
+    else:
+        return f"{s:.2f}s"
+
+
 def timer(func):
     '''
     decorator: measure execution time
@@ -82,7 +93,7 @@ def timer(func):
         start = time.time()
         result = func(*args, **kwargs)
         elapsed = time.time() - start
-        logger.info(f"[{func.__name__}] done. time: {elapsed:.2f}s ({elapsed/60:.2f}min) ({elapsed/60/60:.2f}h) ({elapsed/60/60/24:.2f}d)")
+        logger.info(f"[{func.__name__}] done. time: {format_time(elapsed)}")
         return result
     return wrapper
 

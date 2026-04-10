@@ -10,7 +10,7 @@ from get_biotype import get_biotype_from_gtf
 root = Path(__file__).resolve().parents[1]
 dev_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(dev_root))
-from utils.utils import find_file, mkdir, logger, execute_cmd
+from utils.utils import find_file, mkdir, logger, execute_cmd, timer
 
 class SeuratGtf():
     def __init__(self, args):
@@ -26,10 +26,12 @@ class SeuratGtf():
         self.outdir = Path(args.outdir)
         mkdir(self.outdir)
 
+    @timer
     def get_biotype(self) -> None:
         cmd = get_biotype_from_gtf(self.gtf, self.outdir)
         execute_cmd(cmd)
 
+    @timer
     def run_seurat(self) -> None:
         cmd = (f'Rscript {root}/script/seurat.R '
               f'--matrix_10X {self.matrix_10X} '
@@ -45,6 +47,7 @@ class SeuratGtf():
               )
         execute_cmd(cmd)
 
+    @timer
     def run(self) -> None:
         self.get_biotype()
         self.run_seurat()
@@ -63,7 +66,6 @@ def main():
     parsers.add_argument('--outdir', default = "outdir", help='outdir, default: outdir')
 
     args = parsers.parse_args()
-    print(args)
     runner = SeuratGtf(args) 
     runner.run()
 
