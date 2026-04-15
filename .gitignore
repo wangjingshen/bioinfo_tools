@@ -26,5 +26,6 @@ data_local/
 code/
 result*/
 *outdir/
+*output/
 bak/
 .ipynb_checkpoints/

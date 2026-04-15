@@ -1,0 +1,2 @@
+source activate celescope1.5.1b0
+multi_capture_virus                    --mapfile celescope_mapfile                     --virus_genome /SGRNJ03/randd/test_rd/dxh/data/HBV_genome/                     --thread 4                    --not_consensus                     --outFilterMatchNmin 80                     --umi_threshold otsu                     --allowNoPolyT                     --gtf /SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2022-10-18_gtf/HBV.gtf
