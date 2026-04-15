@@ -1,26 +1,30 @@
-# 忽略 Python 编译文件
-*.pyc
-__pycache__/
-
-# 忽略虚拟环境目录
-venv/
-env/
-
-# 忽略日志文件
-*.log
-
-# 忽略临时文件
-*.tmp
-*.swp
-
-# 忽略文件夹
-#test*/
-code/
-result/
-.ipynb_checkpoints
-
 # 忽略文件
 *.rds
 *.ipynb
 *.pth
 *.pt
+
+## 忽略 Python 编译文件
+*.pyc
+__pycache__/
+
+## 忽略虚拟环境目录
+venv
+env
+
+## 忽略日志文件
+*.log
+*nohup.out*
+
+## 忽略临时文件
+*.tmp
+*.swp
+
+
+# 忽略文件夹
+data_local/
+code/
+result*/
+*outdir/
+bak/
+.ipynb_checkpoints/
