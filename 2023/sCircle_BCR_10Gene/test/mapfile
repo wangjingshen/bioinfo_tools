@@ -1,0 +1,3 @@
+matrix_10X	fj_UMI	outdir	name
+/SGRNJ06/randd/PROJECT/RD20102301_DZH/sCircle_BCR_10Gene/20230809/G0801_1_10Gene_ZL/05.count/G0801_1_10Gene_ZL_filtered_feature_bc_matrix/	/SGRNJ06/randd/PROJECT/RD20102301_DZH/sCircle_BCR_10Gene/20230810/G0801_1_10Gene_FJ/06.filter_virus/G0801_1_10Gene_FJ_filtered_UMI.csv	outdir	G0801_1_10Gene
+/SGRNJ06/randd/PROJECT/RD20102301_DZH/sCircle_BCR_10Gene/20230809/G0801_2_10Gene_ZL/05.count/G0801_2_10Gene_ZL_filtered_feature_bc_matrix/	/SGRNJ06/randd/PROJECT/RD20102301_DZH/sCircle_BCR_10Gene/20230810/G0801_2_10Gene_FJ/06.filter_virus/G0801_2_10Gene_FJ_filtered_UMI.csv	outdir	G0801_2_10Gene

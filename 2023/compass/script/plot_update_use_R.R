@@ -1,0 +1,55 @@
+options(warn = -1)    # off warnings 
+suppressMessages({
+    library(argparser)
+    library(data.table)
+    library(tidyverse)
+    library(ggrepel)
+})
+options(warn = 1)     # 
+
+# args --
+argv <- arg_parser('')
+argv <- add_argument(argv, "--wilcox_res", help = "wilcox result")
+argv <- add_argument(argv, "--subsystem", help = "subsystem")
+argv <- add_argument(argv, "--xlab_name", help = "xlab name, figure from plot.py")
+argv <- add_argument(argv, "--size", help = "annotation text size, default:3")
+argv <- add_argument(argv, "--outdir", help = "output dir")
+argv <- add_argument(argv, "--name", help = "output name, default:''")
+argv <- parse_args(argv)
+
+if(!dir.exists(argv$outdir)){
+    dir.create(argv$outdir) 
+}
+argv$size <- ifelse(is.na(argv$size), 3, as.numeric(argv$size))
+argv$name <- ifelse(is.na(argv$name), "", paste0("_", argv$name))
+
+# read table --
+wilcox_res <- fread(argv$wilcox_res)
+plot_data <- wilcox_res %>%
+    filter(subsystem == argv$subsystem)
+p1 <- plot_data %>%
+    ggplot(aes(x = cohens_d, y = -log10(adjusted_pval))) +
+    geom_point() +
+    xlim(c(-max(abs(plot_data$cohens_d)), max(abs(plot_data$cohens_d)))) +
+    xlab(paste0("Cohen's d (", argv$xlab_name, ")"))+
+    ylab('-log10(adjusted_pval)') +
+    ggtitle(argv$subsystem) +
+    geom_vline(xintercept = 0, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = -log10(0.05), color = "red", linetype = "dashed") +
+    theme_classic() + theme(plot.title = element_text(hjust = 0.5))
+ggsave(paste0(argv$outdir, "/compass_plot_update.pdf"), plot=p1, height=5, width=6)
+
+p2 <- plot_data %>%
+    ggplot(aes(x = cohens_d, y = -log10(adjusted_pval))) +
+    geom_text_repel(aes(label = reaction_name), size = argv$size) +
+    geom_point() +
+    xlim(c(-max(abs(plot_data$cohens_d)), max(abs(plot_data$cohens_d)))) +
+    xlab(paste0("Cohen's d (", argv$xlab_name, ")"))+
+    ylab('-log10(adjusted_pval)') +
+    ggtitle(argv$subsystem) +
+    geom_vline(xintercept = 0, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = -log10(0.05), color = "red", linetype = "dashed") +
+    theme_classic() + theme(plot.title = element_text(hjust = 0.5))
+ggsave(paste0(argv$outdir, "/compass_plot_anno_update.pdf"), plot=p2, height=8, width=10)
+
+print("Compass plot done.")

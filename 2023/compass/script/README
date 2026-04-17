@@ -1,0 +1,8 @@
+compass_analysis.py cp from compass gtihub
+
+cp ../../../project/compass/compass_github/Compass-analysis/analysis/compass_analysis.py .
+
+
+
+plot.py v1
+compass_plot.py v2

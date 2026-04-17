@@ -1,0 +1,1 @@
+python /SGRNJ06/randd/USER/wangjingshen/script/2023/release_celescope/multi.py mapfile

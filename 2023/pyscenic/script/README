@@ -1,0 +1,17 @@
+Here, we use pyscenic to 
+
+1.input:
+1)h5ad.
+2)database file. Relevant files have been downloaded in the data folder. (/SGRNJ06/randd/USER/wangjingshen/script/pyscenic/data/), 
+                 including human, mouse and flies.
+
+2.analysis pipeline:
+for example, raw mtx to run pySCENIC 
+0) run mtx_to_h5ad_loom.py and h5ad_anno.py;    
+#
+1) run pyscenic.py;                (output.loom for plot, regulon for plot use cytoscape)
+2) run pyscenic_plot.py;           (reduction, rss, heatmap)
+3) run pyscenic_regulon_plot.py;   (select the regulon of interest, then plot)
+
+3.test path:
+/SGRNJ06/randd/USER/wangjingshen/script/pyscenic/test/test_pbmc/

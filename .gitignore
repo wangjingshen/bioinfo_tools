@@ -3,6 +3,7 @@
 *.ipynb
 *.pth
 *.pt
+Rplots.pdf
 
 ## 忽略 Python 编译文件
 *.pyc
@@ -22,6 +23,7 @@ env
 
 
 # 忽略文件夹
+input/
 data_local/
 code/
 result*/

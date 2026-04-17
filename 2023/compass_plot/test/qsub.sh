@@ -1,0 +1,1 @@
+qsub -cwd -V -l vf=30g,p=20 run_compass.sh

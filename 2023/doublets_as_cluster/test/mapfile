@@ -1,0 +1,3 @@
+rds	mix_species	outdir	name
+/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2023-08-10_mouse882_doublets/mouse882_X1_ZL/06.analysis/mouse882_X1_ZL.rds	/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2023-08-10_mouse882_doublets/doublets/mouse882_X1_ZL.mix_Species.txt	outdir	mouse882_X1_ZL
+/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2023-08-10_mouse882_doublets/mouse882_X2_ZL/06.analysis/mouse882_X2_ZL.rds	/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2023-08-10_mouse882_doublets/doublets/mouse882_X2_ZL.mix_Species.txt	outdir	mouse882_X2_ZL

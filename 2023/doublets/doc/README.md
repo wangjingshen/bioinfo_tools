@@ -1,0 +1,5 @@
+get_doublets_3_update.pl for xxx_filtered_feature_bc_matrix
+
+get_doublets_3.pl for xxx_matrix_10X
+
+取消设置umi_cutoff为200，保留所有细胞

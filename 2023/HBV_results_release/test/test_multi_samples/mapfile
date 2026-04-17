@@ -1,0 +1,3 @@
+prefix	outdir	name	rds	fj_path	consensus_path
+HBV_220118_1_EZ_ZL	results	HBV_220118	/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/rds/2022-11-10_HBV-220118_sn_add.rds	/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2022-12-29_celescope/celescope/FJ/HBV_220118_FJ/	/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2022-12-30_virus_gene_consensus/gene_consensus/HBV_220118_FJ/
+H006_ZL	results	H006	/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/rds/2022-11-28_H006-hs0831-hs0912.rds	/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2022-12-29_celescope/celescope/FJ/H006_3_FJ/	/SGRNJ06/randd/USER/wangjingshen/project/huashan_HBV/data/2022-12-30_virus_gene_consensus/gene_consensus/H006_3_FJ/

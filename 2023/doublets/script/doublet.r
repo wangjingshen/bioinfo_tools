@@ -1,0 +1,5 @@
+library(Seurat)
+library(tidyverse)
+args=commandArgs(T)
+PRO<-Read10X(args[1])
+write.table (PRO, file =args[2], sep ="\t", row.names =TRUE, col.names =NA, quote =FALSE)

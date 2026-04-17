@@ -1,0 +1,1 @@
+python /SGRNJ06/randd/USER/wangjingshen/script/2023/rename_celescope/cp_rename_multi.py mapfile
