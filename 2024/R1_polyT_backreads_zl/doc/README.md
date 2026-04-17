@@ -1,0 +1,3 @@
+R1跑barcode流程,从而得到和R2一样的reads名.根据R2比对上HBV的bam文件提取相应的reads名.
+根据reads名提取R2能比对上HBV对应的R1,并保留polyT之后的序列,
+再将那些序列比对到HBV

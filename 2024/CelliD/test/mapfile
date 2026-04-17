@@ -1,0 +1,4 @@
+rds	resolution	species	mode	organ	ref	nfeatures	outdir
+/SGRNJ06/randd/USER/wangjingshen/project/pancreatic_cancer/data/data_merge_new.rds	0.6	Hs	single	Pancreas	raw	200	mode_single
+/SGRNJ06/randd/USER/wangjingshen/project/pancreatic_cancer/data/data_merge_new.rds	0.6	Hs	all	Pancreas	raw	200	mode_all
+/SGRNJ06/randd/USER/wangjingshen/project/pancreatic_cancer/data/data_merge_new.rds	0.6	Hs	common	Pancreas	raw	200	mode_common

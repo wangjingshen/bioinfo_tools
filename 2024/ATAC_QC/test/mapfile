@@ -1,0 +1,3 @@
+fragment spname gname species outdir
+/SGRNJ06/randd/PROJECT/scATAC/summary_10X_data_analysis/mouse/20231206_mouse_embryo/E11_5WT_XA10X_outdir/outs/fragments.tsv.gz embryo_10X embryo_10X mm10 embryo_10X_outdir
+/SGRNJ06/randd/PROJECT/scATAC/20231017_EM_sc_JC/A0920_4_ME_YSPB_WX_R_T7_EDTA5030/03.atac/A0920_4_ME_YSPB_WX_R_T7_EDTA5030/outs/fragments.tsv.gz embryo_self_use_10X embryo_self_use_10X mm10 embryo_self_use_10X_outdir
