@@ -10,8 +10,18 @@ import time
 
 from bam_to_gtf import bam_to_bed,bed_to_gtf
 
-dev_root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(dev_root))
+def add_root(levels_up=5):
+    root = Path(__file__).resolve()
+    for _ in range(levels_up):
+        root = root.parent
+    if not (root / "utils").exists():
+        raise FileNotFoundError(f"utils not found in {root}.")
+    sys.path.insert(0, str(root))
+    return(root)
+
+root_path = add_root(5)  # Top 5 parent directories of current script (bioinfo_tools)
+script_path = Path(__file__).resolve().parent
+
 from utils.utils import mkdir, logger, execute_cmd, tmp_chdir
 
 

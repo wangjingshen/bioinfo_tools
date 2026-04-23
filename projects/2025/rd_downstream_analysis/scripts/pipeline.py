@@ -10,7 +10,7 @@ def qc_plot(csv, spname = None):
     '''
     cmd1 = (
         f'/SGRNJ06/randd/USER/wangjingshen/soft/miniforge3/envs/r4.1_env_bak/bin/Rscript '
-        f'/SGRNJ06/randd/USER/wangjingshen/script_old/rna_down/script/qc_plot.R '
+        f'/SGRNJ06/randd/USER/wangjingshen/bioinfo_tools/projects/2025/rd_downstream_analysis/scripts/qc_plot.R '
         f'--csv {csv} '
         f'--spname {spname} '
         f'--outdir 01.qc_plot/ '
@@ -23,7 +23,7 @@ def getrds(matrix_10X, spname, gname, species):
     '''
     cmd1 = (
         f'/SGRNJ01/Public/Software/conda_env/r4.1_env/bin/Rscript '
-        f'/SGRNJ06/randd/USER/wangjingshen/script_old/seurat/script/seurat.R '
+        f'/SGRNJ06/randd/USER/wangjingshen/bioinfo_tools/projects/2022/seurat/scripts/seurat.R '
         f'--matrix_10X {matrix_10X} '
         f'--spname {spname} '
         f'--gname {gname} '

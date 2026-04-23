@@ -89,7 +89,7 @@ def timer(func):
     '''
     @wraps(func)
     def wrapper(*args, **kwargs):
-        logger.info(f"[{func.__name__}] start...")
+        logger.info(f"[{func.__name__}] start.")
         start = time.time()
         result = func(*args, **kwargs)
         elapsed = time.time() - start

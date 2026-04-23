@@ -11,11 +11,20 @@ import psutil
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
-ROOT = Path(__file__).resolve().parent
-#ROOT = os.path.dirname(os.path.abspath(__file__))
-dev_root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(dev_root))
+def add_root(levels_up=5):
+    root = Path(__file__).resolve()
+    for _ in range(levels_up):
+        root = root.parent
+    if not (root / "utils").exists():
+        raise FileNotFoundError(f"utils not found in {root}.")
+    sys.path.insert(0, str(root))
+    return(root)
+
+root_path = add_root(5)  # Top 5 parent directories of current script (bioinfo_tools)
+script_path = Path(__file__).resolve().parent
+
 from utils.utils import mkdir, logger, execute_cmd, timer, run_with_single_thread
+
 
 
 class AutoAssign:
@@ -33,7 +42,7 @@ class AutoAssign:
         auto assign
         '''
         mkdir(self.spname)
-        execute_cmd((f'Rscript {ROOT}/auto_assign.R '
+        execute_cmd((f'Rscript {script_path}/auto_assign.R '
                 f'--rds {self.rds} '
                 f'--spname {self.spname} '
                 f'--anno_var {self.anno_var} '
@@ -47,7 +56,7 @@ class AutoAssign:
         '''
         plot
         '''
-        execute_cmd((f'Rscript {ROOT}/auto_assign_plot.R '
+        execute_cmd((f'Rscript {script_path}/auto_assign_plot.R '
                 f'--rds {self.rds} '
                 f'--anno_file {self.anno_file} '
                 f'--outdir {self.spname}/plot '
@@ -56,12 +65,12 @@ class AutoAssign:
     
     @timer
     def run(self) -> None:
-        logger.info(f'{self.spname} start...')
+        logger.info(f'sample: {self.spname} start analysis.')
         step_order = ['auto_assign', 'plot']
         for step in step_order:
             if step in self.step:
                 getattr(self, step)()
-        logger.info(f'{self.spname} completed.')
+        logger.info(f'sample: {self.spname} completed.')
 
 
 def main():
