@@ -28,7 +28,7 @@ argv <- add_argument(argv, "--rm_batch", default = "F", help="rm batch, T or F, 
 argv <- add_argument(argv, "--rm_batch_var", default ="sample", help="rm batch var, default: sample")
 argv <- add_argument(argv, "--ndims", default = 10, type = "integer", help="ndims, default: 10")
 argv <- add_argument(argv, "--resolution", default = 0.8, type = "double", help="resolution, default: 0.8")
-argv <- add_argument(argv, "--spatial_vis", default = "F", help = "spatial_vis, default: F")
+argv <- add_argument(argv, "--spatial_test_vis", default = "F", help = "spatial_test_vis, default: F")
 argv <- add_argument(argv, "--outdir", default = "outdir", help = "output dir, default: outdir")
 argv <- parse_args(argv)
 
@@ -96,15 +96,16 @@ if(argv$normalize_method == "dsb"){
         Normalize(method = "dsb", isotype_controls = isotype_controls, assay = "PNA")
 }
 if(argv$normalize_method == "clr"){
-    pg_data_combined[["clr_assay"]] <- pg_data_combined[["PNA"]]
+    #pg_data_combined[["clr_assay"]] <- pg_data_combined[["PNA"]]
     pg_data_combined <- pg_data_combined %>% 
         JoinLayers() %>% 
-        Normalize(method = "clr", assay = "clr_assay")  
+        Normalize(method = "clr", assay = "PNA")  # clr_assay
 }
 
 # cluster --
 DefaultAssay(pg_data_combined) <- "PNA"
 pg_data_combined <- pg_data_combined %>%
+    FindVariableFeatures(layer = "data") %>%   # test
     ScaleData(verbose = F) %>%
     RunPCA(verbose = F)
 
@@ -142,11 +143,11 @@ deg_clusters <- FindAllMarkers(pg_data_combined, test.use = "wilcox", assay = "P
 write_tsv(deg_clusters[, c(7,1:6)], file.path(outdir, "cluster", "deg_clusters.tsv"))
 #write.table(deg_clusters[, c(7,1:6)], str_glue("{outdir}/cluster/deg_clusters.tsv"), sep="\t", row.names=F, quote =F)
 
-if(argv$spatial_vis){
-    display_cluster = "0"
+if(argv$spatial_test_vis){
+    display_test_cluster = "0"
     # Cell Visualization
     display_component <- ProximityScores(pg_data_combined, meta_data_columns = c("seurat_clusters"), add_marker_counts = TRUE) %>% 
-        filter(seurat_clusters == display_cluster) %>% 
+        filter(seurat_clusters == display_test_cluster) %>% 
         filter(marker_1 == marker_2) %>%
         arrange(-log2_ratio) %>% pull(component) %>% head(1)
 
