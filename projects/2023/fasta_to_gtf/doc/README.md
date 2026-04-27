@@ -16,11 +16,13 @@ step2：使用 bedToGenePred + genePredToGtf 生成 gtf 文件。
 
 --fasta ： 目标基因片段序列
 
---star_version ： star的版本，默认为 old；如果是 2.7.11a 需设置为new
+--star_path ： star的位置
 
 --prefix ： 前缀名
 
---update ： 非必须参数，当加上该参数时，会根据（手动更新的，具体见特殊情况）bed 文件生成 gtf
+--force ： 是否重新生成 bam
+
+--threads： star比对的线程数
 
 #### 输出
 
@@ -28,7 +30,7 @@ step2：使用 bedToGenePred + genePredToGtf 生成 gtf 文件。
 
 #### 测试示例
 
-/SGRNJ06/randd/USER/wangjingshen/script/fasta_to_gtf/test/
+/SGRNJ06/randd/USER/wangjingshen/script_dev/fasta_to_gtf/test/
 
 
 ## 特殊情况
