@@ -5,10 +5,18 @@ import argparse
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
-ROOT = Path(__file__).resolve().parent
-#ROOT = os.path.dirname(os.path.abspath(__file__))
-dev_root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(dev_root))
+def add_root(levels_up=5):
+    root = Path(__file__).resolve()
+    for _ in range(levels_up):
+        root = root.parent
+    if not (root / "utils").exists():
+        raise FileNotFoundError(f"utils not found in {root}.")
+    sys.path.insert(0, str(root))
+    return(root)
+
+root_path = add_root(5)  # Top 5 parent directories of current script (bioinfo_tools)
+script_path = Path(__file__).resolve().parent
+
 from istar2spots import istar2spots
 from utils.utils import mkdir, logger, execute_cmd, timer, run_with_single_thread
 
@@ -49,7 +57,7 @@ class IStarSpots:
 
     @timer
     def spot_plot(self) -> None:
-        execute_cmd(f'/SGRNJ/Public/Software/conda_env/r4.1_env/bin/Rscript {ROOT}/seurat_plot.R '
+        execute_cmd(f'/SGRNJ/Public/Software/conda_env/r4.1_env/bin/Rscript {script_path}/seurat_plot.R '
                     f'--space_input {self.space_input} '
                     f'--istar2spots {self.outdir}/istar2spots_df.csv '
                     f'--outdir {self.outdir} ')

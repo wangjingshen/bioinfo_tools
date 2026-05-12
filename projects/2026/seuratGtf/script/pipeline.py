@@ -6,11 +6,24 @@ import sys
 from pathlib import Path
 import time
 
+def insert_sys_path(levels_up):
+    '''
+    insert bioinfo_tools to sys.path
+    '''
+    root = Path(__file__).resolve()
+    for _ in range(levels_up):
+        root = root.parent
+    if not (root / "utils").exists():
+        raise FileNotFoundError(f"utils not found in {root}.")
+    sys.path.insert(0, str(root))
+    return(root)
+
+bioinfo_root = insert_sys_path(5)  # Top 5 parent directories of current script (bioinfo_tools)
+pipeline_root = Path(__file__).resolve().parents[1]
+
 from get_biotype import get_biotype_from_gtf
-root = Path(__file__).resolve().parents[1]
-dev_root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(dev_root))
 from utils.utils import find_file, mkdir, logger, execute_cmd, timer
+
 
 class SeuratGtf():
     def __init__(self, args):
@@ -33,7 +46,7 @@ class SeuratGtf():
 
     @timer
     def run_seurat(self) -> None:
-        cmd = (f'Rscript {root}/script/seurat.R '
+        cmd = (f'Rscript {pipeline_root}/script/seurat.R '
               f'--matrix_10X {self.matrix_10X} '
               f'--spname {self.spname} '
               f'--gname {self.gname} '

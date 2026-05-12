@@ -3,37 +3,46 @@
 
 ## 解决方案
 step1：将目标基因片段和参考基因组比对得到bam文件，使用 bamToBed 获取 bed12 文件；
-
 step2：使用 bedToGenePred + genePredToGtf 生成 gtf 文件。
 
 
 ## 脚本
-/SGRNJ06/randd/USER/wangjingshen/script/fasta_to_gtf/script/fasta_to_gtf.py
+/SGRNJ06/randd/USER/wangjingshen/bioinfo_tools/projects/2023/fasta_to_gtf/scripts/fasta_to_gtf.py
 
-#### 主要参数
+## 测试示例
+/SGRNJ06/randd/USER/wangjingshen/bioinfo_tools/projects/2023/fasta_to_gtf/test
 
---genome ： 基因组位置
+## 使用
 
---fasta ： 目标基因片段序列
+### 命令
+子命令 run: 基础命令，从 fasta 生成 gtf
+子命令 update: 根据更新后的 bed 重新生成 gtf，具体参见 子命令 update 详解
 
---star_path ： star的位置
+### 参数
+#### 公共参数
+--prefix    prefix
 
---prefix ： 前缀名
+#### 子命令 run 参数
+--genome    参考基因组位置
 
---force ： 是否重新生成 bam
+--fasta     fasta
 
---threads： star比对的线程数
+--star      star的路径，默认 旧版star：/Public/Software/miniconda2/envs/old/bin/STAR
+                       备选 新版star：/SGRNJ/Public/Software/conda_env/celescope2.1.0/bin/STAR-avx2
 
-#### 输出
+--threads   star比对的线程数，默认4
 
+--force     是否重新 star 获取 bam
+
+#### 子命令 update 参数
+--bed       bed文件
+
+### 输出
 {prefix}.gtf：  gtf 文件
 
-#### 测试示例
 
-/SGRNJ06/randd/USER/wangjingshen/script_dev/fasta_to_gtf/test/
-
-
-## 特殊情况
+## 子命令 update 详解
+下述两种情况在更新好 bed文件 之后，需跑 update 子命令重新生成正确的 gtf。 
 
 #### 基因片段过长，超过 star 的比对长度上限（649bp）
 
@@ -66,8 +75,6 @@ step2：使用 bedToGenePred + genePredToGtf 生成 gtf 文件。
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | test | 2 | 132 | geneA | 255 | - | 2 | 132 | 255，0，0 | 2 | 28,30 | 0，100 |
 
-
-上述两种情况在更新好 bed文件 之后，需添加 --update 参数再次运行脚本以生成正确的 gtf。 
 
 
 ## reference

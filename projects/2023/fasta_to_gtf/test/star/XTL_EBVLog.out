@@ -1,0 +1,138 @@
+STAR version=2.7.11a
+STAR compilation time,server,dir=2023-09-15T02:58:53+0000 :/opt/conda/conda-bld/star_1694746407721/work/source
+##### Command Line:
+/SGRNJ/Public/Software/conda_env/celescope2.1.0/bin/STAR-avx2 --runThreadN 4 --genomeDir /SGRNJ06/randd/PROJECT/RD20102301_DZH/dzh_test/cuishuang/P26020701_XTL_GOTN_EBV/XTL_GOTN_EBV_genome --readFilesIn /SGRNJ06/randd/USER/wangjingshen/rd_project/2026/ebv/r2/XTL_EBV_gene.fa --outSAMtype BAM SortedByCoordinate --outFileNamePrefix XTL_EBV
+##### Initial USER parameters from Command Line:
+outFileNamePrefix                 XTL_EBV
+###### All USER parameters from Command Line:
+runThreadN                    4     ~RE-DEFINED
+genomeDir                     /SGRNJ06/randd/PROJECT/RD20102301_DZH/dzh_test/cuishuang/P26020701_XTL_GOTN_EBV/XTL_GOTN_EBV_genome     ~RE-DEFINED
+readFilesIn                   /SGRNJ06/randd/USER/wangjingshen/rd_project/2026/ebv/r2/XTL_EBV_gene.fa        ~RE-DEFINED
+outSAMtype                    BAM   SortedByCoordinate        ~RE-DEFINED
+outFileNamePrefix             XTL_EBV     ~RE-DEFINED
+##### Finished reading parameters from all sources
+
+##### Final user re-defined parameters-----------------:
+runThreadN                        4
+genomeDir                         /SGRNJ06/randd/PROJECT/RD20102301_DZH/dzh_test/cuishuang/P26020701_XTL_GOTN_EBV/XTL_GOTN_EBV_genome
+readFilesIn                       /SGRNJ06/randd/USER/wangjingshen/rd_project/2026/ebv/r2/XTL_EBV_gene.fa   
+outFileNamePrefix                 XTL_EBV
+outSAMtype                        BAM   SortedByCoordinate   
+
+-------------------------------
+##### Final effective command line:
+/SGRNJ/Public/Software/conda_env/celescope2.1.0/bin/STAR-avx2   --runThreadN 4   --genomeDir /SGRNJ06/randd/PROJECT/RD20102301_DZH/dzh_test/cuishuang/P26020701_XTL_GOTN_EBV/XTL_GOTN_EBV_genome   --readFilesIn /SGRNJ06/randd/USER/wangjingshen/rd_project/2026/ebv/r2/XTL_EBV_gene.fa      --outFileNamePrefix XTL_EBV   --outSAMtype BAM   SortedByCoordinate   
+----------------------------------------
+
+Number of fastq files for each mate = 1
+ParametersSolo: --soloCellFilterType CellRanger2.2 filtering parameters:  3000 0.99 10
+WARNING: --limitBAMsortRAM=0, will use genome size as RAM limit for BAM sorting
+Finished loading and checking parameters
+Reading genome generation parameters:
+### /SGRNJ/Public/Software/conda_env/celescope3.0.0/bin/STAR-avx2   --runMode genomeGenerate      --runThreadN 16   --genomeDir ./   --genomeFastaFiles XTL_EBV_genome.fa      --genomeSAindexNbases 7
+### GstrandBit=32
+versionGenome                 2.7.4a     ~RE-DEFINED
+genomeType                    Full     ~RE-DEFINED
+genomeFastaFiles              XTL_EBV_genome.fa        ~RE-DEFINED
+genomeSAindexNbases           7     ~RE-DEFINED
+genomeChrBinNbits             18     ~RE-DEFINED
+genomeSAsparseD               1     ~RE-DEFINED
+genomeTransformType           None     ~RE-DEFINED
+genomeTransformVCF            -     ~RE-DEFINED
+sjdbOverhang                  0     ~RE-DEFINED
+sjdbFileChrStartEnd           -        ~RE-DEFINED
+sjdbGTFfile                   -     ~RE-DEFINED
+sjdbGTFchrPrefix              -     ~RE-DEFINED
+sjdbGTFfeatureExon            exon     ~RE-DEFINED
+sjdbGTFtagExonParentTranscripttranscript_id     ~RE-DEFINED
+sjdbGTFtagExonParentGene      gene_id     ~RE-DEFINED
+sjdbInsertSave                Basic     ~RE-DEFINED
+genomeFileSizes               262144   1417543        ~RE-DEFINED
+Genome version is compatible with current STAR
+Number of real (reference) chromosomes= 1
+1	EBV_NC_007605	171823	0
+Started loading the genome: Mon May 11 16:19:53 2026
+
+Genome: size given as a parameter = 262144
+SA: size given as a parameter = 1417543
+SAindex: size given as a parameter = 1
+Read from SAindex: pGe.gSAindexNbases=7  nSAi=21844
+nGenome=262144;  nSAbyte=1417543
+GstrandBit=32   SA number of indices=343646
+Shared memory is not used for genomes. Allocated a private copy of the genome.
+Genome file size: 262144 bytes; state: good=1 eof=0 fail=0 bad=0
+Loading Genome ... done! state: good=1 eof=0 fail=0 bad=0; loaded 262144 bytes
+SA file size: 1417543 bytes; state: good=1 eof=0 fail=0 bad=0
+Loading SA ... done! state: good=1 eof=0 fail=0 bad=0; loaded 1417543 bytes
+Loading SAindex ... done: 95643 bytes
+Finished loading the genome: Mon May 11 16:19:53 2026
+
+alignIntronMax=alignMatesGapMax=0, the max intron size will be approximately determined by (2^winBinNbits)*winAnchorDistNbins=589824
+Created thread # 1
+Created thread # 2
+Created thread # 3
+Completed: thread #2
+Completed: thread #0
+Completed: thread #3
+BAM sorting: 9 mapped reads
+BAM sorting bins genomic start loci:
+1	0	5530
+2	0	5530
+3	0	5530
+4	0	5530
+5	0	5530
+6	0	5530
+7	0	5530
+8	0	5530
+9	0	5530
+10	0	5530
+11	0	5530
+12	0	5530
+13	0	5530
+14	0	5530
+15	0	5530
+16	0	5530
+17	0	5530
+18	0	5530
+19	0	5530
+20	0	5530
+21	0	5530
+22	0	5530
+23	0	5530
+24	0	5530
+25	0	5530
+26	0	5530
+27	0	5530
+28	0	5530
+29	0	5530
+30	0	5530
+31	0	5530
+32	0	5530
+33	0	5530
+34	0	5530
+35	0	5530
+36	0	5530
+37	0	5530
+38	0	5530
+39	0	5530
+40	0	5530
+41	0	5530
+42	0	5530
+43	0	5530
+44	0	5530
+45	0	5530
+46	0	5530
+47	0	5530
+48	0	5530
+Completed: thread #1
+Joined thread # 1
+Joined thread # 2
+Joined thread # 3
+May 11 16:19:55 ..... finished mapping
+RAM after mapping:
+VmPeak:	  847792 kB; VmSize:	  782256 kB; VmHWM:	  406104 kB; VmRSS:	  406100 kB; 
+RAM after freeing genome index memory:
+VmPeak:	  847792 kB; VmSize:	  780608 kB; VmHWM:	  406104 kB; VmRSS:	  404608 kB; 
+May 11 16:19:55 ..... started sorting BAM
+Max memory needed for sorting = 4658
+ALL DONE!

@@ -19,8 +19,8 @@ def add_root(levels_up=5):
     sys.path.insert(0, str(root))
     return(root)
 
-root_path = add_root(5)  # Top 5 parent directories of current script (bioinfo_tools)
-script_path = Path(__file__).resolve().parent
+bioinfo_root = add_root(5)  # Top 5 parent directories of current script (bioinfo_tools)
+pipeline_root = Path(__file__).resolve().parents[1]
 
 from utils.utils import mkdir, logger, execute_cmd, tmp_chdir
 

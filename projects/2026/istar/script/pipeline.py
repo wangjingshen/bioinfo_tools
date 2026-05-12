@@ -15,10 +15,18 @@ import psutil
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
-ROOT = Path(__file__).resolve().parent
-#ROOT = os.path.dirname(os.path.abspath(__file__))
-dev_root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(dev_root))
+def add_root(levels_up=5):
+    root = Path(__file__).resolve()
+    for _ in range(levels_up):
+        root = root.parent
+    if not (root / "utils").exists():
+        raise FileNotFoundError(f"utils not found in {root}.")
+    sys.path.insert(0, str(root))
+    return(root)
+
+root_path = add_root(5)  # Top 5 parent directories of current script (bioinfo_tools)
+script_path = Path(__file__).resolve().parent
+
 from utils.utils import mkdir, logger, execute_cmd, timer, run_with_single_thread
 
 
@@ -64,14 +72,14 @@ class IStar:
         '''
         logger.info(f"[{self.spname}] Running input step.")
         mkdir(self.spname)
-        execute_cmd((f'/SGRNJ/Public/Software/conda_env/r4.1_env/bin/Rscript {ROOT}/gen_cnts_locs.R '
+        execute_cmd((f'/SGRNJ/Public/Software/conda_env/r4.1_env/bin/Rscript {script_path}/gen_cnts_locs.R '
                 f'--mtx {self.mtx} '
                 f'--pos {self.pos} '
                 f'--spname {self.spname} '
                 f'--swap_pos {self.swap_pos}'
                 ))
         if not os.path.exists("checkpoints"):
-            execute_cmd(f'cp -r {ROOT}/../data/checkpoints/ .')
+            execute_cmd(f'cp -r {script_path}/../data/checkpoints/ .')
 
         with open(f'{self.dir}/outs/spatial/scalefactors_json.json') as f:
             sf = json.load(f)
@@ -94,16 +102,16 @@ class IStar:
         preprocess_image
         '''
         logger.info(f"[{self.spname}] Running preprocess step.")
-        execute_cmd(f'python {ROOT}/istar/rescale.py {self.spname}/ --image')
-        execute_cmd(f'python {ROOT}/istar/preprocess.py {self.spname} --image')
+        execute_cmd(f'python {script_path}/istar/rescale.py {self.spname}/ --image')
+        execute_cmd(f'python {script_path}/istar/preprocess.py {self.spname} --image')
         # extract histology features
-        execute_cmd(f'python {ROOT}/istar/extract_features.py {self.spname} --device={CONFIG["DEVICE"]}')
+        execute_cmd(f'python {script_path}/istar/extract_features.py {self.spname} --device={CONFIG["DEVICE"]}')
         # auto detect tissue mask
-        execute_cmd(f'python {ROOT}/istar/get_mask.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.mask_method}')
+        execute_cmd(f'python {script_path}/istar/get_mask.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.mask_method}')
         # select most highly variable genes to predict
-        execute_cmd(f'python {ROOT}/istar/select_genes.py --n-top={CONFIG["N_HVG"]} {self.spname}/cnts.tsv {self.spname}/gene-names.txt')
+        execute_cmd(f'python {script_path}/istar/select_genes.py --n-top={CONFIG["N_HVG"]} {self.spname}/cnts.tsv {self.spname}/gene-names.txt')
         # rescale coordinates and spot radius
-        execute_cmd(f'python {ROOT}/istar/rescale.py {self.spname} --locs --radius')
+        execute_cmd(f'python {script_path}/istar/rescale.py {self.spname} --locs --radius')
         logger.info(f"[{self.spname}] preprocess done.")
 
     @timer
@@ -113,17 +121,17 @@ class IStar:
         '''
         logger.info(f"[{self.spname}] Running impute step.")
         # train gene expression prediction model and predict at super-resolution
-        execute_cmd(f'python {ROOT}/istar/impute.py {self.spname} --epochs={CONFIG["EPOCHS"]} --device={CONFIG["DEVICE"]}')
+        execute_cmd(f'python {script_path}/istar/impute.py {self.spname} --epochs={CONFIG["EPOCHS"]} --device={CONFIG["DEVICE"]}')
         # visualize imputed gene expression
-        execute_cmd(f'python {ROOT}/istar/plot_imputed.py {self.spname}')
+        execute_cmd(f'python {script_path}/istar/plot_imputed.py {self.spname}')
         logger.info(f"[{self.spname}] impute done.")
 
     @timer
     def cluster(self) -> None:
         logger.info(f"[{self.spname}] Running cluster step.")
         # segment image by gene features
-        #execute_cmd(f'python {ROOT}/istar/cluster.py --filter-size={CONFIG["FilterSize"]} --min-cluster-size={CONFIG["MinClusterSize"]} --n-clusters={CONFIG["N_CLUSTERS"]} --mask={self.spname}/mask-small.png {self.spname}/embeddings-gene.pickle {self.spname}/clusters-gene/')
-        run_with_single_thread((f'python {ROOT}/istar/cluster.py ' 
+        #execute_cmd(f'python {script_path}/istar/cluster.py --filter-size={CONFIG["FilterSize"]} --min-cluster-size={CONFIG["MinClusterSize"]} --n-clusters={CONFIG["N_CLUSTERS"]} --mask={self.spname}/mask-small.png {self.spname}/embeddings-gene.pickle {self.spname}/clusters-gene/')
+        run_with_single_thread((f'python {script_path}/istar/cluster.py ' 
                         f'--filter-size={CONFIG["FilterSize"]} '
                         f'--min-cluster-size={CONFIG["MinClusterSize"]} '
                         f'--n-clusters={CONFIG["N_CLUSTERS"]} '
@@ -131,11 +139,11 @@ class IStar:
                         f'{self.spname}/embeddings-gene.pickle '
                         f'{self.spname}/clusters-gene/'))
         # differential analysis by clusters
-        execute_cmd(f'python {ROOT}/istar/aggregate_imputed.py {self.spname}')
-        execute_cmd(f'python {ROOT}/istar/reorganize_imputed.py {self.spname}')
-        execute_cmd(f'python {ROOT}/istar/differential.py {self.spname}')
+        execute_cmd(f'python {script_path}/istar/aggregate_imputed.py {self.spname}')
+        execute_cmd(f'python {script_path}/istar/reorganize_imputed.py {self.spname}')
+        execute_cmd(f'python {script_path}/istar/differential.py {self.spname}')
         # visualize spot-level gene expression data
-        execute_cmd(f'python {ROOT}/istar/plot_spots.py {self.spname}')
+        execute_cmd(f'python {script_path}/istar/plot_spots.py {self.spname}')
         logger.info(f"[{self.spname}] cluster done.")
     
 
