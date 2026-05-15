@@ -6,12 +6,23 @@ import sys
 from pathlib import Path
 import time
 
-root = Path(__file__).resolve().parents[1]
-print(root)
-dev_root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(dev_root))
-#print(sys.path)
+
+def add_root():
+    root = Path(__file__).resolve().parent
+    while not (root / "utils").exists():
+        parent = root.parent
+        if parent == root:
+            raise FileNotFoundError("utils not found！")
+        root = parent
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    return root
+
+bioinfo_root = add_root()
+pipeline_root = Path(__file__).resolve().parents[1]
+
 from utils.utils import find_file, mkdir, logger, execute_cmd
+
 
 class SpacePathseq():
     def __init__(self, space_dir:str, pathseq_df:str, topn_genus:str, outdir:str):
@@ -31,7 +42,7 @@ class SpacePathseq():
             execute_cmd(cmd)
 
     def run_seurat_space(self) -> None:
-        cmd = (f'Rscript {root}/script/seurat_space.R '
+        cmd = (f'Rscript {pipeline_root}/scripts/seurat_space.R '
               f'--pathseq_df {self.pathseq_df} '
               f'--topn {self.topn_genus} '
               f'--outdir {self.outdir} ')

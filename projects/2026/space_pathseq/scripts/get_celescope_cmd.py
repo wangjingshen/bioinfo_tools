@@ -3,8 +3,18 @@ import argparse
 from pathlib import Path
 import sys
 
-dev_root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(dev_root))
+def add_root():
+    root = Path(__file__).resolve().parent
+    while not (root / "utils").exists():
+        parent = root.parent
+        if parent == root:
+            raise FileNotFoundError("utils not found！")
+        root = parent
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    return root
+
+bioinfo_root = add_root()
 from utils.utils import find_file, mkdir, logger, execute_cmd
 
 microbe_bwa_image = '/SGRNJ06/randd/USER/wangjingshen/pipeline/sc16S/reference/pathseq_microbe/pathseq_microbe.fa.img'
@@ -32,9 +42,9 @@ def write_cmd(mapfile, species, sample):
             f' --step sample,starsolo ')
     execute_cmd(cmd1)
 
-    cmds = [f'head -n 4 shell/{sample}.sh > shell/cmd_space.sh',
-            f'sed -i "s#celescope#/SGRNJ/Public/Software/conda_env/celescope3.0.0/bin/celescope#" shell/cmd_space.sh',
-            f'''sed -i "s/space starsolo/space starsolo --STAR_param '--outSAMunmapped Within'/" shell/cmd_space.sh''']
+    cmds = [f'cp shell/{sample}.sh shell/cmd_space.sh',   # f'head -n 4 shell/{sample}.sh > shell/cmd_space.sh',
+            f'''sed -i "s/space starsolo/space starsolo --STAR_param '--outSAMunmapped Within'/" shell/cmd_space.sh''',
+            f'sed -i "s#Celescope finished successfully#Celescope space finished successfully#" shell/cmd_space.sh']
     for i in cmds:
         execute_cmd(i)
 
@@ -48,13 +58,15 @@ def write_cmd(mapfile, species, sample):
             f'--microbe_taxonomy_file {microbe_taxonomy_file} '
             f'--downsample_reads 10000000 '
             f'--mod shell '
-            f'--step pathseq,count_pathseq,analysis_pathseq')
+            f'--step pathseq,count_pathseq')
     execute_cmd(cmd2)
 
-    cmds = [f'tail -n 5 shell/{sample}.sh > shell/cmd_pathseq.sh ',
-            f'sed -i "s#celescope#/SGRNJ/Public/Software/conda_env/celescope2.2.0/bin/celescope#" shell/cmd_pathseq.sh ',
+    cmds = [f'mv shell/{sample}.sh > shell/cmd_pathseq.sh ',
+            f'sed -i "s#celescope3.0.0#/celescope2.2.0#" shell/cmd_pathseq.sh',
+            f'sed -i "s#01.starsolo#/outs#" shell/cmd_pathseq.sh',
+            f'sed -i "s#Celescope finished successfully#Celescope pathseq finished successfully#" shell/cmd_pathseq.sh',
             f'cat shell/cmd_space.sh  shell/cmd_pathseq.sh > shell/{sample}.sh ',
-            f'rm shell/cmd_space.sh  shell/cmd_pathseq.sh']
+            f'rm shell/tmp  shell/cmd_space.sh  shell/cmd_pathseq.sh']
     for i in cmds:
         execute_cmd(i)
 
