@@ -21,13 +21,18 @@ data <- Read10X(mtx)
 write.table(t(as.matrix(data)), str_glue("{spname}/cnts.tsv"), sep="\t", quote = F)
 
 # make pos
+# https://github.com/daviddaiweizhang/istar/issues/1
+# y = pxl_row_in_fullres and x = pxl_col_in_fullres
+# barcode             in_tissue  array_row  array_col  pxl_row_in_fullres  pxl_col_in_fullres
+# GTCACTTCCTTCTAGA-1  0          0          0          1832                11971
+
 pos <- read.table(pos, sep=",", header = 0)
-if(swap_pos %in% c("T","True", "TRUE")){
+if(swap_pos %in% c("T", "True", "TRUE")){
     pos <- pos[,c(1, 6, 5)]
 }else{
     pos <- pos[,c(1, 5, 6)]
 }
-colnames(pos) <- c("spot","x","y")
+colnames(pos) <- c("spot", "x", "y")
 pos <- pos[ match(colnames(data), pos$spot),]
 write.table(pos, str_glue("{spname}/locs-raw.tsv"), sep="\t", quote = F, row.names = F)
 

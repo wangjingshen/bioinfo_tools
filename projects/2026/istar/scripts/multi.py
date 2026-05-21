@@ -1,8 +1,6 @@
 import os
 os.environ['OMP_NUM_THREADS'] = '32'
 os.environ['MKL_NUM_THREADS'] = '32'
-#os.environ['OPENBLAS_NUM_THREADS'] = '1'
-#os.environ['NUMEXPR_NUM_THREADS'] = '1'
 import sys
 import pandas as pd
 import argparse
@@ -15,20 +13,21 @@ import psutil
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
-def add_root(levels_up=5):
-    root = Path(__file__).resolve()
-    for _ in range(levels_up):
-        root = root.parent
-    if not (root / "utils").exists():
-        raise FileNotFoundError(f"utils not found in {root}.")
-    sys.path.insert(0, str(root))
-    return(root)
+def add_root():
+    root = Path(__file__).resolve().parent
+    while not (root / "utils").exists():
+        parent = root.parent
+        if parent == root:
+            raise FileNotFoundError("utils not found！")
+        root = parent
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    return root
 
-root_path = add_root(5)  # Top 5 parent directories of current script (bioinfo_tools)
-script_path = Path(__file__).resolve().parent
+bioinfo_root = add_root()
+pipeline_root = Path(__file__).resolve().parents[1]
 
 from utils.utils import mkdir, logger, execute_cmd, timer, run_with_single_thread
-
 
 CONFIG = {
     "DEVICE": "cpu",  # or "cuda"
@@ -37,13 +36,14 @@ CONFIG = {
     "EPOCHS": 400,
     "FilterSize": 8,
     "MinClusterSize": 20,
-    "N_CLUSTERS": 10
+    "N_CLUSTERS": 10,
+    "CMD_Threads": 1
 }
 
 
 
 class IStar:
-    def __init__(self, dir: Path, image: Path, spname: str, swap_pos: str, mask_method: str, step: str):
+    def __init__(self, dir: Path, image: Path, spname: str, swap_pos: str, mask_method: str, cluster_method: str, step: str):
         self.dir = dir
         filtered_dir = os.path.join(dir, "outs", "filtered")
         pos = os.path.join(dir, "outs", "spatial", "positions_list.csv")
@@ -61,6 +61,7 @@ class IStar:
 
         self.swap_pos = swap_pos
         self.mask_method = mask_method
+        self.cluster_method = cluster_method
         self.spname = spname.rstrip("/") + "/"  #  spname+"/"  #istar prefix
         self.step = step.strip().split(',')
 
@@ -70,16 +71,15 @@ class IStar:
         '''
         generate_input
         '''
-        logger.info(f"[{self.spname}] Running input step.")
         mkdir(self.spname)
-        execute_cmd((f'/SGRNJ/Public/Software/conda_env/r4.1_env/bin/Rscript {script_path}/gen_cnts_locs.R '
+        execute_cmd((f'/SGRNJ/Public/Software/conda_env/r4.1_env/bin/Rscript {pipeline_root}/scripts//gen_cnts_locs.R '
                 f'--mtx {self.mtx} '
                 f'--pos {self.pos} '
                 f'--spname {self.spname} '
                 f'--swap_pos {self.swap_pos}'
                 ))
         if not os.path.exists("checkpoints"):
-            execute_cmd(f'cp -r {script_path}/../data/checkpoints/ .')
+            execute_cmd(f'cp -r {pipeline_root}/scripts//../data/checkpoints/ .')
 
         with open(f'{self.dir}/outs/spatial/scalefactors_json.json') as f:
             sf = json.load(f)
@@ -94,7 +94,6 @@ class IStar:
             f.write(str(CONFIG["PixelSize"]))
 
         execute_cmd(f'cp {self.image} {self.spname}/he-raw.png')
-        logger.info(f"[{self.spname}] input done.")
 
     @timer
     def preprocess(self) -> None:
@@ -102,16 +101,16 @@ class IStar:
         preprocess_image
         '''
         logger.info(f"[{self.spname}] Running preprocess step.")
-        execute_cmd(f'python {script_path}/istar/rescale.py {self.spname}/ --image')
-        execute_cmd(f'python {script_path}/istar/preprocess.py {self.spname} --image')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/rescale.py {self.spname}/ --image')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/preprocess.py {self.spname} --image')
         # extract histology features
-        execute_cmd(f'python {script_path}/istar/extract_features.py {self.spname} --device={CONFIG["DEVICE"]}')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/extract_features.py {self.spname} --device={CONFIG["DEVICE"]}')
         # auto detect tissue mask
-        execute_cmd(f'python {script_path}/istar/get_mask.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.mask_method}')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/get_mask.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.mask_method}')
         # select most highly variable genes to predict
-        execute_cmd(f'python {script_path}/istar/select_genes.py --n-top={CONFIG["N_HVG"]} {self.spname}/cnts.tsv {self.spname}/gene-names.txt')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/select_genes.py --n-top={CONFIG["N_HVG"]} {self.spname}/cnts.tsv {self.spname}/gene-names.txt')
         # rescale coordinates and spot radius
-        execute_cmd(f'python {script_path}/istar/rescale.py {self.spname} --locs --radius')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/rescale.py {self.spname} --locs --radius')
         logger.info(f"[{self.spname}] preprocess done.")
 
     @timer
@@ -121,31 +120,32 @@ class IStar:
         '''
         logger.info(f"[{self.spname}] Running impute step.")
         # train gene expression prediction model and predict at super-resolution
-        execute_cmd(f'python {script_path}/istar/impute.py {self.spname} --epochs={CONFIG["EPOCHS"]} --device={CONFIG["DEVICE"]}')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/impute.py {self.spname} --epochs={CONFIG["EPOCHS"]} --device={CONFIG["DEVICE"]}')
         # visualize imputed gene expression
-        execute_cmd(f'python {script_path}/istar/plot_imputed.py {self.spname}')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/plot_imputed.py {self.spname}')
         logger.info(f"[{self.spname}] impute done.")
 
     @timer
     def cluster(self) -> None:
-        logger.info(f"[{self.spname}] Running cluster step.")
         # segment image by gene features
-        #execute_cmd(f'python {script_path}/istar/cluster.py --filter-size={CONFIG["FilterSize"]} --min-cluster-size={CONFIG["MinClusterSize"]} --n-clusters={CONFIG["N_CLUSTERS"]} --mask={self.spname}/mask-small.png {self.spname}/embeddings-gene.pickle {self.spname}/clusters-gene/')
-        run_with_single_thread((f'python {script_path}/istar/cluster.py ' 
-                        f'--filter-size={CONFIG["FilterSize"]} '
-                        f'--min-cluster-size={CONFIG["MinClusterSize"]} '
-                        f'--n-clusters={CONFIG["N_CLUSTERS"]} '
-                        f'--mask={self.spname}/mask-small.png '
-                        f'{self.spname}/embeddings-gene.pickle '
-                        f'{self.spname}/clusters-gene/'))
-        # differential analysis by clusters
-        execute_cmd(f'python {script_path}/istar/aggregate_imputed.py {self.spname}')
-        execute_cmd(f'python {script_path}/istar/reorganize_imputed.py {self.spname}')
-        execute_cmd(f'python {script_path}/istar/differential.py {self.spname}')
-        # visualize spot-level gene expression data
-        execute_cmd(f'python {script_path}/istar/plot_spots.py {self.spname}')
-        logger.info(f"[{self.spname}] cluster done.")
+        #execute_cmd(f'python {pipeline_root}/scripts//istar/cluster.py --filter-size={CONFIG["FilterSize"]} --min-cluster-size={CONFIG["MinClusterSize"]} --n-clusters={CONFIG["N_CLUSTERS"]} --mask={self.spname}/mask-small.png {self.spname}/embeddings-gene.pickle {self.spname}/clusters-gene/')
+        run_with_single_thread((f'python {pipeline_root}/scripts//istar/cluster.py ' 
+                          f'--filter-size={CONFIG["FilterSize"]} '
+                          f'--min-cluster-size={CONFIG["MinClusterSize"]} '
+                          f'--n-clusters={CONFIG["N_CLUSTERS"]} '
+                          f'--mask={self.spname}/mask-small.png '
+                          f'--method={self.cluster_method} '
+                          f'{self.spname}/embeddings-gene.pickle '
+                          f'{self.spname}/clusters-gene/'))
     
+    @timer
+    def downstream(self) -> None:
+        # differential analysis by clusters
+        execute_cmd(f'python {pipeline_root}/scripts//istar/aggregate_imputed.py {self.spname}')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/reorganize_imputed.py {self.spname}')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/differential.py {self.spname}')
+        # visualize spot-level gene expression data
+        execute_cmd(f'python {pipeline_root}/scripts//istar/plot_spots.py {self.spname}')
 
     @timer
     def ln_outs(self) -> None:
@@ -159,40 +159,43 @@ class IStar:
 
     @timer
     def run(self) -> None:
-        step_order = ['input', 'preprocess', 'impute', 'cluster', 'ln_outs']
+        step_order = ['input', 'preprocess', 'impute', 'cluster', 'downstream', 'ln_outs']
         for step in step_order:
             if step in self.step:
                 getattr(self, step)()
 
 
-def parse_mapfile(mapfile, step):
+def parse_mapfile(mapfile, cluster_method, step):
     df = pd.read_csv(mapfile, sep=r'\s+')
+    df['cluster_method'] = cluster_method
     df['step'] = step
-    columns = ['dir', 'image', 'spname', 'swap_pos', 'mask_method', 'step']    
+    columns = ['dir', 'image', 'spname', 'swap_pos', 'mask_method', 'cluster_method', 'step']    
     return [df[col] for col in columns]
 
-def run_single(dir, image, spname, swap_pos, mask_method, step):
+def run_single(dir, image, spname, swap_pos, mask_method, cluster_method, step):
     try:
-        runner = IStar(dir, image, spname, swap_pos, mask_method, step)
+        logger.info(f'{spname} start...')
+        runner = IStar(dir, image, spname, swap_pos, mask_method, cluster_method, step)
         runner.run()
-        logger.info(f'Completed: {spname}')
+        logger.info(f'{spname} completed.')
     except Exception as e:
-        logger.error(f'JOB FAILED: {spname}',
+        logger.error(f'{spname} failed: ',
               file=sys.stderr)
         traceback.print_exc()
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mapfile', help='tsv:dir<>image<>spname<>swap_pos<>mask_method', required=True)
-    parser.add_argument('--step', default='input,preprocess,impute,cluster,ln_outs', help='comma-separated step')
+    parser.add_argument('--step', default='input,preprocess,impute,cluster,downstream,ln_outs', help='comma-separated step')
+    parser.add_argument('--cluster_method', default='km', help='cluster method')
     parser.add_argument('--threads', type=int, default=1, help='thread pool size')
     args = parser.parse_args()
 
-    dir_list, image_list, spname_list, swap_pos_list, mask_method_list, step_list = parse_mapfile(args.mapfile, args.step)
+    dir_list, image_list, spname_list, swap_pos_list, mask_method_list, cluster_method_list, step_list = parse_mapfile(args.mapfile, args.cluster_method, args.step)
     
     logger.info(f"Starting pipeline with {len(dir_list)} samples and {args.threads} thread(s).")
     with ThreadPoolExecutor(max_workers = args.threads) as executor:
-        executor.map(run_single, dir_list, image_list, spname_list, swap_pos_list, mask_method_list, step_list)
+        executor.map(run_single, dir_list, image_list, spname_list, swap_pos_list, mask_method_list, cluster_method_list, step_list)
 
 
 if __name__ == '__main__':

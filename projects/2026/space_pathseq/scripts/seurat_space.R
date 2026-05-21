@@ -18,15 +18,21 @@ argv <- parse_args(argv)
 outdir <- argv$outdir
 
 # space
-data_seurat <- Load10X_Spatial("seurat_input/") %>%
+data_seurat <- Load10X_Spatial("seurat_input/") 
+data_seurat <- subset(data_seurat, nCount_Spatial > 0)  # filter 0 spots
+data_seurat %>%
     SCTransform(assay = "Spatial", return.only.var.genes = FALSE, verbose = FALSE) %>%
     RunPCA(assay = "SCT", verbose = FALSE) %>%
     FindNeighbors(reduction = "pca", dims = 1:30, verbose = F) %>%
     FindClusters(verbose = FALSE) %>%
     RunUMAP(reduction = "pca", dims = 1:30, verbose = F) 
 
+SpatialDimPlot(data_space, group.by = "seurat_clusters")
+ggsave(str_glue("{outdir}/space_seurat_clusters.png"), height = 6, width = 8)
+
 # pathseq
 pathseq_df <- read.table(argv$pathseq_df, sep="\t", header = T, row.names = 1)
+pathseq_df <- pathseq_df[ ,colnames(data_seurat)]  # match rna
 data_seurat@meta.data <- cbind.data.frame(data_seurat@meta.data, t(pathseq_df))
 
 stat_df <- data.frame(Genus = row.names(pathseq_df),
