@@ -15,7 +15,7 @@ def remove_margins(embs, mar):
                 for v in va]
 
 
-def get_mask_embeddings(embs, foreground_method = "max", mar=16, min_connected=4000):
+def get_mask_embeddings(embs, foreground_cluster_method = "max", mar=16, min_connected=4000):
     n_clusters = 2
 
     # remove margins to avoid border effects
@@ -30,10 +30,10 @@ def get_mask_embeddings(embs, foreground_method = "max", mar=16, min_connected=4
 
     # select cluster for foreground
     rgb = np.stack(embs['rgb'], -1)
-    if(foreground_method == "max"):
+    if(foreground_cluster_method == "max"):
         i_foreground = np.argmax([
             rgb[labels == i].std() for i in range(n_clusters)])
-    if(foreground_method == "min"):
+    if(foreground_cluster_method == "min"):
         i_foreground = np.argmin([
             rgb[labels == i].std() for i in range(n_clusters)])
 
@@ -52,10 +52,10 @@ def main():
 
     inpfile = sys.argv[1]
     outfile = sys.argv[2]
-    foreground_method = sys.argv[3]
+    foreground_cluster_method = sys.argv[3]
 
     embs = load_pickle(inpfile)
-    mask = get_mask_embeddings(embs, foreground_method)
+    mask = get_mask_embeddings(embs, foreground_cluster_method)
     save_image(mask, outfile)
 
 

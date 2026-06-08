@@ -7,6 +7,9 @@ from collections import defaultdict
 from itertools import zip_longest
 import pyfastx
 
+
+R2_10X_file = "/SGRNJ06/randd/USER/wangjingshen/bioinfo_tools/projects/2023/ATAC_seq/data/atac_8_pbmc_1k_nextgem_S1_L001_R2_001.fastq.gz"
+
 class Bulk_atac():
     '''
     use cr-atac run bulk atac(R1,R2)
@@ -15,7 +18,7 @@ class Bulk_atac():
         self.fastq_path = fastq_path
         self.prefix = prefix
         self.species = species
-        self.R2_10X_file = "/SGRNJ06/randd/USER/wangjingshen/script/ATAC_seq/data/atac_8_pbmc_1k_nextgem_S1_L001_R2_001.fastq.gz"
+        self.R2_10X_file = R2_10X_file
         self.outdir = outdir
     
 

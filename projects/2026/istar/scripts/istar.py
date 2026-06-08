@@ -42,7 +42,7 @@ CONFIG = {
 
 
 class IStar:
-    def __init__(self, dir, image, spname, swap_pos, foreground_method, cluster_method, hard_radius, n_cluster, step):
+    def __init__(self, dir, image, spname, swap_pos, foreground_method, foreground_cluster_method, cluster_method, hard_radius, n_cluster, step):
         self.dir = dir
         filtered_dir = os.path.join(dir, "outs", "filtered")
         pos = os.path.join(dir, "outs", "spatial", "positions_list.csv")
@@ -60,6 +60,7 @@ class IStar:
 
         self.swap_pos = swap_pos
         self.foreground_method = foreground_method
+        self.foreground_cluster_method = foreground_cluster_method
         self.cluster_method = cluster_method
         self.hard_radius = hard_radius
         self.n_cluster = n_cluster
@@ -115,9 +116,14 @@ class IStar:
     @timer
     def get_mask(self) -> None:
         '''
-        auto detect tissue mask
+        istar: auto detect tissue mask
+        in_tissue: get mask from positions_list
         '''
-        execute_cmd(f'python {pipeline_root}/scripts//istar/get_mask_update.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.foreground_method}')
+        if(self.foreground_method == "istar"):
+            execute_cmd(f'python {pipeline_root}/scripts//istar/get_mask_update.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.foreground_method}')
+        
+        if(self.foreground_method == "in_tissue"):
+            execute_cmd(f'python {pipeline_root}/scripts//istar/get_mask_in_tissue.py {self.pos} {self.spname}/mask-small.png')
 
 
     @timer
@@ -130,7 +136,7 @@ class IStar:
                 f.write(self.hard_radius)
 
         # train gene expression prediction model and predict at super-resolution
-        execute_cmd(f'python {pipeline_root}/scripts//istar/impute.py {self.spname} --epochs={CONFIG["EPOCHS"]} --device={CONFIG["DEVICE"]}')
+        execute_cmd(f'python {pipeline_root}/scripts//istar/impute_update.py {self.spname} --epochs={CONFIG["EPOCHS"]} --device={CONFIG["DEVICE"]}')
         # visualize imputed gene expression
         execute_cmd(f'python {pipeline_root}/scripts//istar/plot_imputed.py {self.spname}')
 
@@ -189,14 +195,15 @@ def main():
     parser.add_argument('--image', help='image', required=True)
     parser.add_argument('--spname', help='spname', required=True)
     parser.add_argument('--swap_pos', default = "T", help='swap postion')
-    parser.add_argument('--foreground_method', default = 'max', help='foreground method')
+    parser.add_argument('--foreground_method', default = 'in_tissue', help='foreground method, in_tissue or istar')
+    parser.add_argument('--foreground_cluster_method', default = 'max', help='foreground cluster method in istar, max or min')
     parser.add_argument('--hard_radius', help='set hard radius')
     parser.add_argument('--cluster_method', default='km', help='cluster method')
     parser.add_argument('--n_cluster', default=10, help='number of cluster')
     parser.add_argument('--step', default='input,preprocess,get_mask,impute,cluster,downstream,output', help='comma-separated step')
     args = parser.parse_args()
 
-    runner = IStar(args.dir, args.image, args.spname, args.swap_pos, args.foreground_method, 
+    runner = IStar(args.dir, args.image, args.spname, args.swap_pos, args.foreground_method, args.foreground_cluster_method,
                    args.cluster_method, args.hard_radius, args.n_cluster, args.step)
     runner.run()
 
