@@ -12,6 +12,7 @@ suppressWarnings(suppressMessages({
     library(argparser)
 }))
 
+options(future.seed = TRUE)
 plan("multicore", workers = 4)
 options(future.globals.maxSize = 20000 * 1024^2) # for 10 Gb RAM
 set.seed(1)
@@ -44,7 +45,7 @@ rm_batch <- ifelse(is.na(argv$rm_batch), "no", argv$rm_batch)
 species <- ifelse(is.na(argv$species), "mouse", argv$species)
 filter_bc <- ifelse(is.na(argv$filter_bc), "null", unlist(strsplit(argv$filter_bc, split = ",")))
 resolution <- ifelse(is.na(argv$resolution), 0.8, as.numeric(argv$resolution))
-saveRDS <- ifelse(is.na(argv$saveRDS), "True", argv$saveRDS)
+saveRDS <- ifelse(is.na(argv$saveRDS), "False", argv$saveRDS)
 outdir <- argv$outdir
 
 if(!dir.exists(outdir)){
@@ -162,13 +163,13 @@ if(rm_batch == "no"){
 if(species == "mouse"){
     suppressWarnings(annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79))
     # change to UCSC style since the data was mapped to hg19
-    seqlevels(annotations) <- paste0('chr', seqlevels(annotations))
+    #seqlevels(annotations) <- paste0('chr', seqlevels(annotations))
     genome(annotations) <- "mm10"
 }
 if(species == "human"){
     suppressWarnings(annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v75))
     # change to UCSC style since the data was mapped to hg19
-    seqlevels(annotations) <- paste0('chr', seqlevels(annotations))
+    #seqlevels(annotations) <- paste0('chr', seqlevels(annotations))
     genome(annotations) <- "hg19"
 }
 
@@ -196,26 +197,38 @@ function_singleR <- function(data, species){
     anno <- SingleR(test = data@assays$RNA@data, ref = ref, 
                     clusters = unlist(data$seurat_clusters),
                     assay.type.test=1, labels = ref$label.main)
-    data$cell_type_singleR <- plyr::mapvalues(x = data$seurat_clusters, from = row.names(anno), to = anno$labels)
+    data$clusters <- plyr::mapvalues(x = data$seurat_clusters, from = row.names(anno), to = anno$labels)
     return(data)
 }
 
 # cluster
-DimPlot(object = combined, label = TRUE)
-ggsave(paste0(outdir, "/clusters.png"), width = 7, height = 5)
+DimPlot(object = combined, group.by = "seurat_clusters", label = TRUE)
+ggsave(str_glue("{outdir}/seurat_clusters.png"), width = 8, height = 6)
 
 # sample
 DimPlot(object = combined, group.by = "sample", label = TRUE)
-ggsave(paste0(outdir, "/sample.png"), width = 7, height = 5)
+ggsave(str_glue("{outdir}/sample.png"), width = 8, height = 6)
 
 # group
 DimPlot(object = combined, group.by = "group", label = TRUE)
-ggsave(paste0(outdir, "/group.png"), width = 7, height = 5)
+ggsave(str_glue("{outdir}/group.png"), width = 8, height = 6)
 
 # anno 
 combined <- function_singleR(combined, species)
-DimPlot(combined, reduction = "umap", group.by = "cell_type_singleR", label = T)
-ggsave(paste0(outdir, "/cell_type.png"), width = 7, height = 5)
+DimPlot(combined, reduction = "umap", group.by = "clusters", label = T)
+ggsave(str_glue("{outdir}/clusters.png"), width = 8, height = 6)
+
+# cellular_composition
+width2 = 5 + 0.5*length(sample)
+ggplot(combined@meta.data, aes(x=sample, fill=clusters)) +
+    geom_bar(color="black",position="fill",width = 0.5) +
+    theme_bw() +
+    theme(legend.title = element_blank(), axis.title = element_blank(), axis.text.x = element_text(hjust = 1, vjust = 1, angle = 45))
+ggsave(str_glue("{outdir}/cellular_composition.png"), height = 6, width = width2)
+
+write.table(
+    xtabs(~ sample + clusters, combined@meta.data) %>% as.data.frame.matrix(),
+    str_glue("{outdir}/sample_clusters.xls"), quote = F, sep = "\t", col.names = F)
 
 # saveRDS
 if(saveRDS == "True"){

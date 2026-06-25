@@ -120,7 +120,7 @@ class IStar:
         in_tissue: get mask from positions_list
         '''
         if(self.foreground_method == "istar"):
-            execute_cmd(f'python {pipeline_root}/scripts//istar/get_mask_update.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.foreground_method}')
+            execute_cmd(f'python {pipeline_root}/scripts//istar/get_mask_update.py {self.spname}/embeddings-hist.pickle {self.spname}/mask-small.png {self.foreground_cluster_method}')
         
         if(self.foreground_method == "in_tissue"):
             execute_cmd(f'python {pipeline_root}/scripts//istar/get_mask_in_tissue.py {self.pos} {self.spname}/mask-small.png')

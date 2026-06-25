@@ -41,8 +41,7 @@ class SeuratGtf():
 
     @timer
     def get_biotype(self) -> None:
-        cmd = get_biotype_from_gtf(self.gtf, self.outdir)
-        execute_cmd(cmd)
+        get_biotype_from_gtf(self.gtf, self.outdir)
 
     @timer
     def run_seurat(self) -> None:
