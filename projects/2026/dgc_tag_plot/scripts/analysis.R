@@ -10,7 +10,7 @@ suppressWarnings(suppressMessages({
     library(glue)
 }))
 
-
+color_protocol <- c("#0067AA","#FF7F00","#00A23F","#FF1F1D","#A763AC","#B45B5D","#FF8AB6","#B6B800","#01C1CC","#85D5F8","#FFC981","#C8571B","#727272","#EFC800","#8A5626","#502E91","#59A4CE","#344B2B","#FBE29D","#FDD6E6","#849C8C","#F07C6F","#000101")
 
 # args --
 argv <- arg_parser('')
@@ -59,6 +59,7 @@ if(VlnPlot %in% c("TRUE","True","T")){
         tsne_df <- input_df[i, 1]
         spname <- input_df[i, 2]
         tsne_df <- read.table(tsne_df, sep="\t",header = T, row.names = 1)
+        tsne_df$bc1 <- row.names(tsne_df)
         row.names(tsne_df) <- paste0(spname, "_", row.names(tsne_df))
         return(tsne_df)
     }
@@ -81,17 +82,35 @@ if(VlnPlot %in% c("TRUE","True","T")){
     data_seurat$log2_tag <- log2(data_seurat$tag + 1)
     data_seurat$cluster_sample <- paste0(data_seurat$cluster, "_", data_seurat$sample)
 
+
+    plot_data = data_seurat@reductions$umap@cell.embeddings %>% 
+        as.data.frame() %>% 
+        cbind(barcode = colnames(data_seurat))
+    plot_data <- cbind(plot_data, data_seurat@meta.data)
+
     # VlnPlot
     function_VlnPlot <- function(plot_var, cutoff, name){
-        p <- VlnPlot(data_seurat, plot_var, group.by = "cluster_sample", pt.size = 0) + 
-            theme(legend.position = "none", axis.title.x = element_blank(),plot.margin = margin(10, 10, 10, 50, "pt")) +
-            ggtitle(tag_name) + 
-            theme(plot.title = element_text(hjust = 0.5))
+        #p <- VlnPlot(data_seurat, plot_var, group.by = "cluster", split.by = "sample", pt.size = 0) + 
+        #    theme(axis.title.x = element_blank(),plot.margin = margin(20, 20, 20, 80, "pt")) +
+        #    ggtitle(tag_name) + 
+        #    theme(plot.title = element_text(hjust = 0.5))
+
+        p <- ggplot(plot_data, aes(x = cluster_sample, y = .data[[plot_var]])) +
+            geom_violin(aes(fill = cluster), scale = "width", trim = TRUE, linewidth = 0.3) +
+            scale_fill_manual(values = color_protocol) +
+            labs(title = tag_name, x = NULL, y = plot_var) +
+            theme_classic() +
+            theme(plot.title = element_text(hjust = 0.5),
+                  axis.title.x = element_blank(),
+                  plot.margin = margin(20, 20, 20, 50, "pt"),
+                  axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
+                  #legend.position = "none")
+
         if(!is.na(cutoff)){
             p <- p + ylim(c(0,10000))
         }
-        ggsave(str_glue("{outdir}/VlnPlot_{tag_name}{name}.png"), plot = p, height = 8, width = 12)
-        ggsave(str_glue("{outdir}/VlnPlot_{tag_name}{name}.pdf"), plot = p, height = 8, width = 12)
+        ggsave(str_glue("{outdir}/VlnPlot_{tag_name}{name}.png"), plot = p, height = 8, width = 15)
+        ggsave(str_glue("{outdir}/VlnPlot_{tag_name}{name}.pdf"), plot = p, height = 8, width = 15)
     }
     function_VlnPlot("tag", cutoff=NA, name="")
     function_VlnPlot("log2_tag", cutoff=NA, name="_log2")

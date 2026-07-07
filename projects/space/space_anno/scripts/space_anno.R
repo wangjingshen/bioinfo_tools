@@ -33,10 +33,13 @@ if(!dir.exists(outdir)){
 data_space <- Load10X_Spatial(space_input)
 # fix 10X demo data
 #print(data_space@images$slice1@coordinates[1:2,])
-#print(class(data_space@images$slice1@coordinates$imagerow))  # character
+#print(class(data_space@images$slice1@coordinates$imagerow))  # character -> numeric
 data_space@images$slice1@coordinates$imagerow <- as.numeric(data_space@images$slice1@coordinates$imagerow)
 data_space@images$slice1@coordinates$imagecol <- as.numeric(data_space@images$slice1@coordinates$imagecol)
-#print(class(data_space@images$slice1@coordinates$imagerow))  # numeric
+
+# filter 0 umi
+data_space$total_umi <- colSums(data_space@assays$Spatial@counts)
+data_space <- subset(data_space, cells = colnames(data_space)[data_space$total_umi > 0])
 
 # space SCT
 data_space <- data_space %>%
