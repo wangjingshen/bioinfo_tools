@@ -15,6 +15,7 @@ color_protocol <- c("#0067AA","#FF7F00","#00A23F","#FF1F1D","#A763AC","#B45B5D",
 argv <- arg_parser('')
 argv <- add_argument(argv, "--space_input", help = "space input")
 argv <- add_argument(argv, "--sc", help = "sc anno rds")
+argv <- add_argument(argv, "--pt_size", default = 1.6, help = "pt_size, Default:1.6")
 argv <- add_argument(argv, "--score_filter", help = "score filter")
 argv <- add_argument(argv, "--filter_cluster", help = "filter cluster in sc")
 argv <- add_argument(argv, "--outdir", default = "outdir", help="outdir, Default: outdir")
@@ -22,6 +23,7 @@ argv <- parse_args(argv)
 
 space_input <- argv$space_input
 sc <- argv$sc
+pt_size <- as.numeric(argv$pt_size)
 score_filter <- as.numeric(argv$score_filter)
 filter_cluster <- unlist(str_split(argv$filter_cluster, ","))
 outdir <- argv$outdir
@@ -49,7 +51,7 @@ data_space <- data_space %>%
     FindClusters(verbose = FALSE)
 
 # plot
-SpatialDimPlot(data_space, group.by = "seurat_clusters", cols = color_protocol)
+SpatialDimPlot(data_space, group.by = "seurat_clusters", cols = color_protocol, pt.size.factor = pt_size)
 ggsave(str_glue("{outdir}/plot/space_seurat_clusters.png"))
 
 # read sc
@@ -81,7 +83,7 @@ SpatialDimPlot(data_space, cells.highlight = cell_types_highlight, facet.highlig
 per_width = 4
 ggsave(str_glue("{outdir}/plot/space_predicted_id_split.png"), width = 4*length(unique(data_space$predicted_id)), height = 9)
 
-SpatialDimPlot(data_space, group.by = "predicted_id", cols = color_protocol)
+SpatialDimPlot(data_space, group.by = "predicted_id", cols = color_protocol, pt.size.factor = pt_size)
 ggsave(str_glue("{outdir}/plot/space_predicted_id.png"), width = 8, height = 6)
 
 #
@@ -89,17 +91,3 @@ SpatialFeaturePlot(data_space, features = unique(data_space$predicted_id), alpha
 ggsave(str_glue("{outdir}/plot/space_predictions_score.png"), width = 4*length(unique(data_space$predicted_id)), height = 9)
 
 saveRDS(data_space, str_glue("{outdir}/data_space.rds"))
-
-# use max (test)
-#predictions.res <- predictions.assay@data
-#rownames(predictions.res) <- make.names(rownames(predictions.res))
-#cell_types <- rownames(predictions.res)
-#for(cell_type in cell_types){
-#    data_space <- AddMetaData(object = data_space, metadata = predictions.res[cell_type,], col.name = cell_type)
-#}
-#data_space$clusters <- apply(predictions.res, 2, function(x){
-#    rownames(predictions.res)[which.max(x)]
-#})
-#SpatialDimPlot(data_space, group.by = "clusters", cols = color_protocol)
-#ggsave(str_glue("{outdir}/space_clusters.png"))
-
