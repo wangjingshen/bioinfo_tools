@@ -18,7 +18,7 @@ dirnameScript <- function(){
     return(dirname)
 }
  
-sourceScript <- function(x, dir='/SGRNJ06/randd/USER/wangjingshen/script_dev/') {
+sourceScript <- function(x, dir='/SGRNJ06/randd/USER/wangjingshen/bioinfo_tools/projects/2023/species_doublet/') {
     # try source script from directory one by one: file itself, dir from argument, script directory
     scriptdir = dirnameScript()
     searchpath = c(x,

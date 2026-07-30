@@ -30,6 +30,7 @@ bioinfo_root = add_root()
 pipeline_root = Path(__file__).resolve().parents[1]
 
 from utils.utils import mkdir, logger, execute_cmd, timer, run_with_single_thread
+from istarSpots import istar2spots
 
 CONFIG = {
     "DEVICE": "cpu",  # or "cuda"
@@ -42,7 +43,7 @@ CONFIG = {
 
 
 class IStar:
-    def __init__(self, dir, image, spname, swap_pos, foreground_method, foreground_cluster_method, cluster_method, hard_radius, n_cluster, step):
+    def __init__(self, dir, image, spname, swap_pos, foreground_method, foreground_cluster_method, cluster_method, hard_radius, n_cluster, k, distance_thresh, clip, step):
         self.dir = dir
         filtered_dir = os.path.join(dir, "outs", "filtered")
         pos = os.path.join(dir, "outs", "spatial", "positions_list.csv")
@@ -65,6 +66,9 @@ class IStar:
         self.hard_radius = hard_radius
         self.n_cluster = n_cluster
         self.spname = spname.rstrip("/") + "/"  #  spname+"/"  #istar prefix
+        self.k = k
+        self.distance_thresh = distance_thresh
+        self.clip = clip
         self.step = step.strip().split(',')
 
 
@@ -114,7 +118,7 @@ class IStar:
 
     
     @timer
-    def get_mask(self) -> None:
+    def getMask(self) -> None:
         '''
         istar: auto detect tissue mask
         in_tissue: get mask from positions_list
@@ -173,16 +177,48 @@ class IStar:
     @timer
     def output(self) -> None:
         mkdir(f'{self.spname}/outs/')
-        execute_cmd(f'cp -r  {self.spname}/clusters-gene/ {self.spname}/outs/')
-        #execute_cmd(f'cd {self.spname}/outs/ && ln -s ../clusters-gene/ .')
-        #execute_cmd(f'cd {self.spname}/outs/ && ln -s ../spots/ .')
-        #execute_cmd(f'cd {self.spname}/outs/ && ln -s ../cnts-super-plots/ .')
+        execute_cmd(f'cp -r  {self.spname}/clusters-gene/ {self.spname}/outs/istar')
+
+
+    @timer
+    def istarSpots(self) -> None:
+        '''
+        {self.outdir}/istar2spots.png
+        {self.outdir}/istar2spots_df.csv
+        '''
+        logger.info(f"[{self.spname}] Running ln_outs step.")
+
+        self.space_input = f'{self.spname}/space_input/'
+        mkdir(self.space_input)
+        execute_cmd((f'cp {self.dir}/outs/filtered_feature_bc_matrix.h5 {self.space_input}'))
+        execute_cmd((f'cp -r {self.dir}/outs/spatial {self.space_input}'))
+        execute_cmd((f'mv {self.space_input}/spatial/positions_list.csv {self.space_input}/spatial/tissue_positions_list.csv'))
+        self.space_pos = f'{self.space_input}/spatial/tissue_positions_list.csv'
+
+        self.istar_labels = f'{self.spname}/outs/istar/labels.pickle'
+        self.istarSpotsOuts = f'{self.spname}/outs/istarSpots'
+        mkdir(self.istarSpotsOuts)
+        istar2spots(self.istar_labels, self.space_pos, self.istarSpotsOuts, self.foreground_method, self.k, self.distance_thresh, self.clip)
+
+        execute_cmd(f'/SGRNJ/Public/Software/conda_env/r4.1_env/bin/Rscript {pipeline_root}/scripts/seurat_plot.R '
+                    f'--space_input {self.space_input} '
+                    f'--istar2spots {self.istarSpotsOuts}/istar2spots_df.csv '
+                    f'--outdir {self.istarSpotsOuts} ')
+
+    @timer
+    def orgdir(self) -> None:
+        mkdir(f'run/')
+        execute_cmd(f'mv {self.spname}/* run ')
+        execute_cmd(f'mv run {self.spname} ')
+        execute_cmd(f'mv {self.spname}/run/outs  {self.spname}/')
+        execute_cmd(f'rm -rf {self.spname}/run/space_input ')
+        execute_cmd(f'rm -rf checkpoints ')
 
 
     @timer
     def run(self) -> None:
         logger.info(f'{self.spname} start...')
-        step_order = ['input', 'preprocess', 'get_mask', 'impute', 'cluster', 'downstream', 'output']
+        step_order = ['input', 'preprocess', 'getMask', 'impute', 'cluster', 'downstream', 'output', 'istarSpots', 'orgdir']
         for step in step_order:
             if step in self.step:
                 getattr(self, step)()
@@ -200,11 +236,14 @@ def main():
     parser.add_argument('--hard_radius', help='set hard radius')
     parser.add_argument('--cluster_method', default='km', help='cluster method')
     parser.add_argument('--n_cluster', default=10, help='number of cluster')
-    parser.add_argument('--step', default='input,preprocess,get_mask,impute,cluster,downstream,output', help='comma-separated step')
+    parser.add_argument('--k', help='k istar pixels', default = 3, type = int)
+    parser.add_argument('--distance_thresh', help='thresh of distance between spots and istar pixels', default=200, type = int)
+    parser.add_argument('--clip', help='clip spots from istar', action='store_true') 
+    parser.add_argument('--step', default='input,preprocess,getMask,impute,cluster,downstream,output,istarSpots,orgdir', help='comma-separated step')
     args = parser.parse_args()
 
     runner = IStar(args.dir, args.image, args.spname, args.swap_pos, args.foreground_method, args.foreground_cluster_method,
-                   args.cluster_method, args.hard_radius, args.n_cluster, args.step)
+                   args.cluster_method, args.hard_radius, args.n_cluster, args.k, args.distance_thresh, args.clip, args.step)
     runner.run()
 
 
