@@ -31,6 +31,7 @@ env
 
 
 # 忽略文件夹
+tmp
 input/
 data_local/
 code/

@@ -49,6 +49,11 @@ def mkdir(dir) -> None:
         logger.error(f"Failed to create directory {dir}: {e}")
 
 
+def rmdir(dir) -> None:
+    cmd = f'rm -rf {dir}'
+    execute_cmd(cmd)
+
+
 def run_with_single_thread(command, **kwargs):
     '''
     Run the command in single-thread mode without affecting the main process.
@@ -122,3 +127,34 @@ def load_pickle(filename, verbose=True):
     if verbose:
         print(f'Pickle loaded from {filename}')
     return x
+
+
+##
+def make_space_input(space_dir, outdir):
+    '''
+    make space input
+    rename positions_list.csv to tissue_positions_list.csv
+    '''
+    space_input = f'{outdir}/space_input/'
+    mkdir(f'{space_input}')
+
+    spatial = Path(f'{space_dir}/outs/spatial')
+    filter_h5 = Path(f'{space_dir}/outs/filtered_feature_bc_matrix.h5')
+    
+    cmds=[f'cp -r {spatial} {space_input}/',
+          f'cp {filter_h5} {space_input}/']
+    for cmd in cmds:
+        execute_cmd(cmd)
+
+    source_path = os.path.join(space_input, "spatial", "positions_list.csv")
+    target_path = os.path.join(space_input, "spatial", "tissue_positions_list.csv")
+
+    if os.path.isfile(source_path):
+        try:
+            os.rename(source_path, target_path)
+        except Exception as e:
+            print(f"failed, {str(e)}")
+    else:
+        print(f"{source_path} not exist.")
+    
+    return(f"{space_input}")

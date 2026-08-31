@@ -19,7 +19,7 @@ outdir <- argv$outdir
 
 space_pathseq_outdir <- str_glue("{outdir}/outs/space_pathseq/")
 if(!dir.exists(space_pathseq_outdir)){
-    dir.create(space_pathseq_outdir)
+    dir.create(space_pathseq_outdir, recursive = TRUE)
 }
 
 
@@ -52,6 +52,6 @@ write.table(stat_df, str_glue("{space_pathseq_outdir}/genus.tsv"), sep="\t", row
 topn <- min(nrow(stat_df), argv$topn)
 lapply(1:topn, function(x){
     plot_genus <- stat_df$Genus[x]
-    SpatialFeaturePlot(object = data_seurat, features = plot_genus, alpha = c(0.1, 1))
+    SpatialFeaturePlot(object = data_seurat, features = plot_genus, alpha = c(0.1, 1), image.alpha = 0.3)
     ggsave(str_glue("{space_pathseq_outdir}/top{x}_{plot_genus}.png"), height = 6, width = 8)
 })

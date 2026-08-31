@@ -47,10 +47,16 @@ class SpacePathseq():
               f'--topn {self.topn_genus} '
               f'--outdir {self.outdir} ')
         execute_cmd(cmd)
+    
+
+    def rm_file(self) -> None:
+        cmd = f'rm -rf seurat_input'
+        execute_cmd(cmd)
 
     def run(self) -> None:
         self.mkdir_seurat_input()
         self.run_seurat_space()
+        self.rm_file()
 
 def main():
     parsers = argparse.ArgumentParser()

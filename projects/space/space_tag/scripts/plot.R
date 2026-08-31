@@ -20,12 +20,18 @@ if(!dir.exists(outdir)){
     dir.create(outdir, recursive = TRUE)
 }
 
-
 data_space <- Load10X_Spatial(space_input)
+if(min(data_space$nCount_Spatial) == 0){
+    cat("0 spots:", sum(data_space$nCount_Spatial == 0), "\n")
+    data_space <- subset(data_space, subset = nCount_Spatial > 0)
+}
+
 tag_umi <- read.table(tag_umi, header=T)
+tag_umi$bc <- row.names(tag_umi)
+tag_umi <- tag_umi[colnames(data_space),]
 
 tryCatch({
-    if (!identical(colnames(data_space), row.names(tag_umi))) {
+    if (!identical(colnames(data_space), tag_umi$bc)) {
         stop("barcode_mismatch")
     }
 }, error = function(e) {
@@ -35,7 +41,6 @@ tryCatch({
 
 
 data_space$tag <- tag_umi[,1]
-
 data_space$log2_nCount_Spatial <- log2(data_space$nCount_Spatial + 1)
 data_space$log2_tag <- log2(data_space$tag + 1)
 

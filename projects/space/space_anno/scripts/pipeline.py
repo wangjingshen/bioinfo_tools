@@ -21,49 +21,45 @@ def add_root():
 bioinfo_root = add_root()
 pipeline_root = Path(__file__).resolve().parents[1]
 
-from utils.utils import find_file, mkdir, logger, execute_cmd
+from utils.utils import find_file, mkdir, logger, execute_cmd, make_space_input
 
 
 class SpaceAnno():
-    def __init__(self, space_dir:str, sc:str, score_filter:float, name:str, outdir:str):
+    def __init__(self, space_dir:str, sc:str, score_filter:float, name:str):
+        self.space_dir = space_dir
         self.spatial = Path(f'{space_dir}/outs/spatial')
         self.filter_h5 = Path(f'{space_dir}/outs/filtered_feature_bc_matrix.h5')
         self.sc = sc
         self.score_filter = score_filter
         self.name = name
-        self.outdir = Path(outdir)
+
 
     def mkdir_seurat_input(self) -> None:
-        mkdir(f"space_input/")
-        cmds=[f'cp -r {self.spatial} space_input/spatial',
-              f'cp {self.filter_h5} space_input',
-              f'mv space_input/spatial/positions_list.csv space_input/spatial/tissue_positions_list.csv']
-        for cmd in cmds:
-            execute_cmd(cmd)
+        self.space_input = make_space_input(self.space_dir, self.name)
 
     def run_transfer_anno(self) -> None:
         cmd = (f'Rscript {pipeline_root}/scripts/space_anno.R '
-              f'--space_input space_input/  '
+              f'--space_input {self.space_input}  '
               f'--sc {self.sc} '
               f'--score_filter {self.score_filter} '
-              f'--outdir {self.outdir} ')
+              f'--outdir {self.name} ')
         execute_cmd(cmd)
 
     def run_rctd_anno(self) -> None:
-        mkdir(f"{self.outdir}/rctd")
+        mkdir(f"{self.name}/rctd")
         cmd1 = (f'/SGRNJ/Public/Software/conda_env/Seuratv5/bin/Rscript {pipeline_root}/scripts/Seurat_cluster_standard.R '
               f'--h5 {self.filter_h5} '
               f'--spatial {self.spatial} '
               f'--name {self.name} '
               f'--group {self.name} '
-              f'--outdir {self.outdir}/rctd_rds ' )
+              f'--outdir {self.name}/rctd_rds ' )
 
         cmd2 = (f'/SGRNJ/Public/Software/conda_env/Seuratv5/bin/Rscript {pipeline_root}/scripts/visium_RCTDscript2.r '
             f'--sc {self.sc} '
-            f'--sp {self.outdir}/rctd_rds/0.Rds/{self.name}.rds '
+            f'--sp {self.name}/rctd_rds/0.Rds/{self.name}.rds '
             f'--slot Spatial '
             f'--prefix {self.name} '
-            f'--outdir {self.outdir}/rctd ' )
+            f'--outdir {self.name}/rctd ' )
         execute_cmd(cmd1)
         execute_cmd(cmd2)
 
@@ -78,10 +74,9 @@ def main():
     parsers.add_argument('--sc', help='sc', required=True)
     parsers.add_argument('--score_filter', help='score_filter', default=0)
     parsers.add_argument('--name', help='name', required=True)
-    parsers.add_argument('--outdir', help='outdir', required=True)
 
     args = parsers.parse_args()
-    runner = SpaceAnno(args.space_dir, args.sc, args.score_filter, args.name, args.outdir) 
+    runner = SpaceAnno(args.space_dir, args.sc, args.score_filter, args.name) 
     runner.run()
 
 if __name__ == '__main__':

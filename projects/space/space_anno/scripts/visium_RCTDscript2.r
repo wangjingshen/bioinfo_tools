@@ -199,7 +199,10 @@ sprds <- readRDS(argv$sp)
 slot <- argv$slot
 scrds <- readRDS(argv$sc)
 # scrds <- UpdateSeuratObject(scrds)
-scrds@meta.data$cluster <- scrds@active.ident
+#scrds@meta.data$cluster <- scrds@active.ident
+if("annot_full" %in% colnames(scrds@meta.data)){
+    scrds$cluster <- gsub(" ", "_", scrds$annot_full)  # sgr cloud annotation
+}
 scrds@meta.data <- scrds@meta.data %>% mutate(cluster = str_replace(cluster,"/","_"))
 Idents(scrds) <- 'cluster'
 
