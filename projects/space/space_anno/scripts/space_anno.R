@@ -27,9 +27,10 @@ argv <- arg_parser('')
 argv <- add_argument(argv, "--space_input", help = "space input")
 argv <- add_argument(argv, "--sc", help = "sc anno rds")
 argv <- add_argument(argv, "--pt_size", default = 1.6, help = "pt_size, Default:1.6")
-argv <- add_argument(argv, "--score_filter", help = "score filter")
+argv <- add_argument(argv, "--score_filter", default = 0, help = "score filter, Default:0")
+argv <- add_argument(argv, "--image_alpha", default = 0.5, help = "image alpha, Default:0.5")
 argv <- add_argument(argv, "--filter_cluster", help = "filter cluster in sc")
-argv <- add_argument(argv, "--resolution", default = 0.5, help = "resolution")
+argv <- add_argument(argv, "--resolution", default = 0.3, help = "resolution")
 argv <- add_argument(argv, "--name", help="name")
 argv <- parse_args(argv)
 
@@ -37,11 +38,14 @@ space_input <- argv$space_input
 sc <- argv$sc
 pt_size <- as.numeric(argv$pt_size)
 score_filter <- as.numeric(argv$score_filter)
+image_alpha <- as.numeric(argv$image_alpha)
 filter_cluster <- unlist(str_split(argv$filter_cluster, ","))
 resolution <- argv$resolution
 name <- argv$name
-if(!dir.exists(str_glue("{name}/plot"))){
-    dir.create(str_glue("{name}/plot"), recursive = TRUE)
+
+plot_dir <- str_glue("{name}/transfer")
+if(!dir.exists(plot_dir)){
+    dir.create(plot_dir, recursive = TRUE)
 }
 
 # read space
@@ -65,8 +69,8 @@ data_space <- data_space %>%
 
 # plot
 SpatialDimPlot(data_space, group.by = "seurat_clusters", cols = color_protocol, pt.size.factor = pt_size)
-ggsave(str_glue("{name}/plot/space_seurat_clusters.png"))
-ggsave(str_glue("{name}/plot/space_seurat_clusters.pdf"))
+ggsave(str_glue("{plot_dir}/space_seurat_clusters.png"))
+ggsave(str_glue("{plot_dir}/space_seurat_clusters.pdf"))
 
 # read sc
 data_sc <- readRDS(sc)
@@ -80,8 +84,8 @@ data_sc <- SCTransform(data_sc, ncells = 3000, verbose = FALSE) %>%
     RunPCA(verbose = FALSE) %>%
     RunUMAP(dims = 1:30)
 DimPlot(data_sc, group.by = "cluster", cols = color_protocol, label = TRUE)
-ggsave(str_glue("{name}/plot/sc_clusters.png"), height = 6, width = 10)
-ggsave(str_glue("{name}/plot/sc_clusters.pdf"), height = 6, width = 10)
+ggsave(str_glue("{plot_dir}/sc_clusters.png"), height = 6, width = 10)
+ggsave(str_glue("{plot_dir}/sc_clusters.pdf"), height = 6, width = 10)
 
 anchors <- FindTransferAnchors(reference = data_sc, query = data_space, normalization.method = "SCT")
 predictions.assay <- TransferData(anchorset = anchors, refdata = data_sc$cluster, prediction.assay = TRUE, 
@@ -96,17 +100,17 @@ Idents(data_space) <- data_space$cluster  # "cluster"
 cell_types_highlight <- CellsByIdentities(object = data_space, idents = unique(data_space$cluster))
 SpatialDimPlot(data_space, cells.highlight = cell_types_highlight, facet.highlight = TRUE, ncol = ceiling(length(unique(data_space$cluster))/2))
 per_width = 4
-ggsave(str_glue("{name}/plot/space_cluster_split.png"), width = 4*length(unique(data_space$cluster)), height = 9)
-ggsave(str_glue("{name}/plot/space_cluster_split.pdf"), width = 4*length(unique(data_space$cluster)), height = 9)
+ggsave(str_glue("{plot_dir}/space_cluster_split.png"), width = 4*length(unique(data_space$cluster)), height = 9)
+ggsave(str_glue("{plot_dir}/space_cluster_split.pdf"), width = 4*length(unique(data_space$cluster)), height = 9)
 
 SpatialDimPlot(data_space, group.by = "cluster", cols = color_protocol, pt.size.factor = pt_size)
-ggsave(str_glue("{name}/plot/space_cluster.png"), width = 8, height = 6)
-ggsave(str_glue("{name}/plot/space_cluster.pdf"), width = 8, height = 6)
+ggsave(str_glue("{plot_dir}/space_cluster.png"), width = 8, height = 6)
+ggsave(str_glue("{plot_dir}/space_cluster.pdf"), width = 8, height = 6)
 
 #
-SpatialFeaturePlot(data_space, features = unique(data_space$cluster), alpha = c(0.1, 1), ncol = ceiling(length(unique(data_space$cluster))/2))
-ggsave(str_glue("{name}/plot/space_predictions_score.png"), width = 4*length(unique(data_space$cluster)), height = 9)
-ggsave(str_glue("{name}/plot/space_predictions_score.pdf"), width = 4*length(unique(data_space$cluster)), height = 9)
+SpatialFeaturePlot(data_space, features = unique(data_space$cluster), alpha = c(0.1, 1), image.alpha = image_alpha, ncol = ceiling(length(unique(data_space$cluster))/2))
+ggsave(str_glue("{plot_dir}/space_predictions_score.png"), width = 4*length(unique(data_space$cluster)), height = 9)
+ggsave(str_glue("{plot_dir}/space_predictions_score.pdf"), width = 4*length(unique(data_space$cluster)), height = 9)
 
 
 saveRDS(data_space, str_glue("{name}/data_space.rds"))

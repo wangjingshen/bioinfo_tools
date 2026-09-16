@@ -9,11 +9,13 @@ plot_col <- c("#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377
 argv <- arg_parser('')
 argv <- add_argument(argv, "--space_input", help = "path of space_input")
 argv <- add_argument(argv, "--istar2spots", help = "istar2spots")
+argv <- add_argument(argv, "--image_alpha", help = "image_alpha")
 argv <- add_argument(argv, "--outdir", help = "outdir")
 argv <- parse_args(argv)
 
 space_input <- argv$space_input
 istar2spots <- argv$istar2spots
+image_alpha <- as.numeric(argv$image_alpha)
 outdir <- argv$outdir
 
 #
@@ -24,7 +26,7 @@ df <- df[ match(colnames(data_space), df$barcode),]
 
 if(identical(colnames(data_space), df$barcode)){
     data_space$istar_cluster = df$istar_cluster
-    SpatialDimPlot(data_space, group.by = "istar_cluster", cols = plot_col, pt.size.factor = 1)
+    SpatialDimPlot(data_space, group.by = "istar_cluster", cols = plot_col, pt.size.factor = 1.6, image.alpha = image_alpha)
     ggsave(str_glue("{outdir}/istar_clusters.png"))
 }else{
     print("barcode mismatch.")

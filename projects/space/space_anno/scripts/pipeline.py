@@ -25,12 +25,14 @@ from utils.utils import find_file, mkdir, logger, execute_cmd, make_space_input
 
 
 class SpaceAnno():
-    def __init__(self, space_dir:str, sc:str, score_filter:float, name:str):
+    def __init__(self, space_dir:str, sc:str, score_filter:float, image_alpha:float, resolution:float, name:str):
         self.space_dir = space_dir
         self.spatial = Path(f'{space_dir}/outs/spatial')
         self.filter_h5 = Path(f'{space_dir}/outs/filtered_feature_bc_matrix.h5')
         self.sc = sc
         self.score_filter = score_filter
+        self.image_alpha = image_alpha
+        self.resolution = resolution
         self.name = name
 
 
@@ -42,7 +44,9 @@ class SpaceAnno():
               f'--space_input {self.space_input}  '
               f'--sc {self.sc} '
               f'--score_filter {self.score_filter} '
-              f'--outdir {self.name} ')
+              f'--image_alpha {self.image_alpha} '
+              f'--resolution {self.resolution} '
+              f'--name {self.name} ')
         execute_cmd(cmd)
 
     def run_rctd_anno(self) -> None:
@@ -63,6 +67,12 @@ class SpaceAnno():
         execute_cmd(cmd1)
         execute_cmd(cmd2)
 
+    def mkdir_res(self) -> None:
+        cmd = [
+            
+        ]
+        execute_cmd(cmd)
+
     def run(self) -> None:
         self.mkdir_seurat_input()
         self.run_transfer_anno()
@@ -73,10 +83,12 @@ def main():
     parsers.add_argument('--space_dir', help='space_dir', required=True)
     parsers.add_argument('--sc', help='sc', required=True)
     parsers.add_argument('--score_filter', help='score_filter', default=0)
+    parsers.add_argument('--image_alpha', help='image_alpha', default=0.5)
+    parsers.add_argument('--resolution', help='resolution', default=0.3)
     parsers.add_argument('--name', help='name', required=True)
 
     args = parsers.parse_args()
-    runner = SpaceAnno(args.space_dir, args.sc, args.score_filter, args.name) 
+    runner = SpaceAnno(args.space_dir, args.sc, args.score_filter, args.image_alpha, args.resolution, args.name) 
     runner.run()
 
 if __name__ == '__main__':

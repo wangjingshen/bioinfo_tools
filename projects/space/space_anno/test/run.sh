@@ -5,4 +5,3 @@ python /SGRNJ06/randd/USER/wangjingshen/bioinfo_tools/projects/space/space_anno/
     --sc /SGRNJ07/Standard_Analysis/celelens2local/202606291726_RD24012902_B1/majordataset/RD24012902_B1_major_dataset.rds \
     --score_filter 0 \
     --name Mus_Kidney \
-    --outdir outdir

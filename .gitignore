@@ -32,6 +32,7 @@ env
 
 # 忽略文件夹
 tmp
+run
 input/
 data_local/
 code/
@@ -43,3 +44,4 @@ bak/
 space_input/
 Mint_FFPE_96_96_1119/
 PXL_NJU_ST_Lib/
+Mus_Kidney

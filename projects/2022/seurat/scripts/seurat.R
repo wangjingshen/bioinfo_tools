@@ -28,12 +28,12 @@ spname <- str_replace_all(str_split(argv$spname, ",", simplify = TRUE), "-", "_"
 gname <- str_replace_all(str_split(argv$gname, ",", simplify = TRUE), "-", "_")
 
 if (length(unique(c(length(matrix_10X), length(spname), length(gname)))) > 1) {
-  stop("The quantities of matrix_10X, spname and gname must be consistent！")
+  stop("The quantities of matrix_10X, spname and gname must be consistent!")
 }
 
 rm_batch <- ifelse(is.na(argv$rm_batch), "F", argv$rm_batch)
 rm_batch_var <- ifelse(is.na(argv$rm_batch_var), "sample", argv$rm_batch_var)
-resolution <- ifelse(is.na(argv$resolution), 0.3, argv$resolution)   
+resolution <- ifelse(is.na(argv$resolution), 0.3, as.numeric(argv$resolution)) 
 species <- argv$species
 
 outdir <- argv$outdir
