@@ -31,7 +31,7 @@ env
 
 
 # 忽略文件夹
-tmp
+tmp*
 run
 input/
 data_local/

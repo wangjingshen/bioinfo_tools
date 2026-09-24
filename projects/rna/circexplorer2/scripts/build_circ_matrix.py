@@ -3,19 +3,17 @@
 """
 Build circRNA locus (gene + back-splice site) x cell UMI count matrix
 Row: gene_id|chr:start-end  (e.g. ENSMUSG00000064337|MT:69-69)
-Column: all CeleScope filtered barcodes
-
-Additional output: a barcode-filtered copy of the raw UMI table
-  ({name}_circularRNA_umi_barcode_filtered.tsv) - keeps every original
-  column/row whose CB is in the CeleScope filtered barcode set.
+Additional output:
+1. barcode-filtered copy of the raw UMI table
+   ({name}_circularRNA_umi_barcode_filtered.tsv)
+2. circ_locus_cb_agg.tsv : circ locus × cell agg table (circ_locus\tCB\tUMI_count\tRead_count)
+Fix: duplicate loci print bug, add filter for single-base locus (start==end)
 """
 import argparse
 import gzip
 import statistics
 from collections import defaultdict
-
 TOP_N = 10
-
 
 def is_valid_gene_id(gene_id):
     """Validate gene_id format: retain only valid Ensembl gene IDs starting with ENSMUSG"""
@@ -24,18 +22,16 @@ def is_valid_gene_id(gene_id):
     gene_clean = gene_id.strip()
     return gene_clean.startswith("ENSMUSG")
 
-
 def make_locus_key(chr_, start, end, gene_id):
     """Generate unique locus key: gene_id|chr:start-end"""
     return f"{gene_id}|{chr_}:{start}-{end}"
 
-
 def build_circ_matrix(name, barcode):
-    input = f'circexplorer2/{name}/04.matrix/{name}_circularRNA_umi.tsv'
+    input = f'circexplorer2/{name}/04.matrix/{name}_df.tsv'
     out_mtx = f'circexplorer2/{name}/04.matrix/{name}_circularRNA_mtx.tsv'
-    out_stat = f'circexplorer2/{name}/04.matrix/{name}_circularRNA_stats.txt'
-    # NEW: barcode-filtered copy of the raw UMI table
-    out_filtered = f'circexplorer2/{name}/04.matrix/{name}_circularRNA_umi_barcode_filtered.tsv'
+    out_stat = f'circexplorer2/{name}/04.matrix/{name}_stats.txt'
+    out_filtered = f'circexplorer2/{name}/04.matrix/{name}_df_filtered.tsv'
+    out_agg = f'circexplorer2/{name}/04.matrix/{name}_circularRNA_locus_cb.tsv'
 
     # Column index mapping
     COL = {
@@ -44,7 +40,6 @@ def build_circ_matrix(name, barcode):
         "CB": 5, "UMI": 6,
         "gene_id": 7, "transcript_id": 8, "exon_info": 9,
     }
-
     # 1. Load all CeleScope filtered barcodes
     all_cbs = []
     valid_cb_set = set()
@@ -56,20 +51,20 @@ def build_circ_matrix(name, barcode):
                 valid_cb_set.add(b)
     print(f"CeleScope filtered barcode: {len(all_cbs)}")
 
-    # cell_locus_umi[CB][locus_key] = set(UMIs)
+    # counters
     cell_locus_umi = defaultdict(lambda: defaultdict(set))
+    cell_locus_read = defaultdict(lambda: defaultdict(int))
     positive_cbs = set()
     discarded_dirty_cb = 0
     discarded_invalid_gene = 0
+    discarded_single_base_locus = 0
     total_records = 0
     written_filtered_records = 0
 
-    # 2. Read merged circ table
+    # 2. Read merged circ table (each row = one BSJ read)
     with open(input, "r") as f, open(out_filtered, "w") as fout_filtered:
         header = f.readline()
-        # write header to the barcode-filtered copy
         fout_filtered.write(header)
-
         for line in f:
             line = line.rstrip("\n")
             if not line:
@@ -78,36 +73,50 @@ def build_circ_matrix(name, barcode):
             parts = line.split("\t")
             if len(parts) < 10:
                 continue
-
             chr_ = parts[COL["chr"]]
-            s_bed = parts[COL["bed_start"]]
-            e_bed = parts[COL["bed_end"]]
+            s_bed_str = parts[COL["bed_start"]]
+            e_bed_str = parts[COL["bed_end"]]
             cb   = parts[COL["CB"]]
             umi  = parts[COL["UMI"]]
             gene = parts[COL["gene_id"]]
-
-            # --- Barcode-based filter: decide first, before gene/UMI checks ---
-            # Rows without a usable CB cannot be classified -> skip (also not written)
+            # --- Barcode filter ---
             if not cb or cb == "NA":
                 continue
             if cb not in valid_cb_set:
                 discarded_dirty_cb += 1
                 continue
-            # CB passes the filtered set -> keep the original row as-is in the filtered copy
             fout_filtered.write(line + "\n")
             written_filtered_records += 1
-
-            # --- Downstream matrix field validation ---
+            # --- gene filter ---
             if not umi or umi == "NA" or not gene or gene == "NA":
                 continue
             if not is_valid_gene_id(gene):
                 discarded_invalid_gene += 1
                 continue
+            # filter single-base sites: start == end
+            try:
+                s_bed = int(s_bed_str)
+                e_bed = int(e_bed_str)
+            except ValueError:
+                continue
+            if s_bed == e_bed:
+                discarded_single_base_locus +=1
+                continue
 
-            # Build locus key: gene_id|chr:start-end
             locus_key = make_locus_key(chr_, s_bed, e_bed, gene)
             cell_locus_umi[cb][locus_key].add(umi)
+            cell_locus_read[cb][locus_key] += 1
             positive_cbs.add(cb)
+
+    # ========== Output circ_locus_cb_agg.tsv; Read_count stores actual raw read counts ==========
+    with open(out_agg, "w") as f_agg:
+        f_agg.write("circ_locus\tCB\tUMI_count\tRead_count\n")
+        for cb, locus_dict in cell_locus_umi.items():
+            for locus_str, umi_set in locus_dict.items():
+                umi_cnt = len(umi_set)
+                read_cnt = cell_locus_read[cb][locus_str]
+                f_agg.write(f"{locus_str}\t{cb}\t{umi_cnt}\t{read_cnt}\n")
+    print(f"Aggregated table saved: {out_agg}")
 
     # Collect all unique loci
     all_loci = set()
@@ -128,9 +137,8 @@ def build_circ_matrix(name, barcode):
         locus_stats[loc] = {
             "total_umi": total_umi,
             "cells_detected": cells_detected,
-            "detection_rate": cells_detected / len(positive_cbs) if positive_cbs else 0
+            "detection_rate": cells_detected / len(all_cbs) if len(all_cbs) >0 else 0
         }
-
     sorted_loci = sorted(all_loci, key=lambda l: locus_stats[l]["total_umi"], reverse=True)
     top_loci = sorted_loci[:TOP_N]
 
@@ -149,21 +157,18 @@ def build_circ_matrix(name, barcode):
     n_total_cells = len(all_cbs)
     n_cells_with_circ = len(positive_cbs)
     n_no_circ = n_total_cells - n_cells_with_circ
-
     loci_per_cell = []
     umis_per_cell  = []
     for cb in positive_cbs:
         ldict = cell_locus_umi[cb]
         loci_per_cell.append(len(ldict))
         umis_per_cell.append(sum(len(umis) for umis in ldict.values()))
-
     median_loci = statistics.median(loci_per_cell) if loci_per_cell else 0
     median_umi  = statistics.median(umis_per_cell)  if umis_per_cell else 0
     mean_loci   = statistics.mean(loci_per_cell) if loci_per_cell else 0
     mean_umi    = statistics.mean(umis_per_cell) if umis_per_cell else 0
     max_umi     = max(umis_per_cell) if umis_per_cell else 0
     max_loci    = max(loci_per_cell) if loci_per_cell else 0
-
     total_umi_all = sum(locus_stats[l]["total_umi"] for l in all_loci)
 
     # ========== Output statistics summary ==========
@@ -171,6 +176,7 @@ def build_circ_matrix(name, barcode):
         f"Input circ file: {input}",
         f"Barcode source: {barcode}",
         f"Barcode-filtered UMI table: {out_filtered}",
+        f"Agg table: {out_agg}",
         f"Records written to barcode-filtered table: {written_filtered_records}",
         f"Total records (merged table): {total_records}",
         f"Matrix dimension: {len(all_loci)} circRNA loci x {n_total_cells} CeleScope filtered cells",
@@ -184,46 +190,51 @@ def build_circ_matrix(name, barcode):
         f"----------------------------------------",
         f"Discarded records with barcodes not in filtered set: {discarded_dirty_cb}",
         f"Discarded records with invalid gene_id (non-ENSMUSG format): {discarded_invalid_gene}",
+        f"Discarded single-base BSJ loci (start == end): {discarded_single_base_locus}",
         f"----------------------------------------",
         f"[Positive cell statistics]",
         f"  Detected circRNA loci per cell: median={median_loci:.1f}, mean={mean_loci:.2f}, max={max_loci}",
         f"  Total circ UMI per cell: median={median_umi:.1f}, mean={mean_umi:.2f}, max={max_umi}",
         f"----------------------------------------",
         f"[Locus-level statistics] TOP{TOP_N} (sorted by total UMI, descending)",
-        f"  Total unique circRNA loci: {len(all_loci)}",
-        f"  Total circ UMI across all loci: {total_umi_all}",
-        f"",
         f"  {'locus':<45} {'Total_UMI':>10} {'Detected_Cells':>12} {'Detection_Rate(%)':>12}",
         f"  {'-'*45} {'-'*10} {'-'*12} {'-'*12}",
     ]
+    # echo TOP10
+    print(f"\n[Locus-level statistics] TOP{TOP_N} (sorted by total UMI, descending)")
+    print(f"  {'locus':<45} {'Total_UMI':>10} {'Detected_Cells':>12} {'Detection_Rate(%)':>12}")
+    print(f"  {'-'*45} {'-'*10} {'-'*12} {'-'*12}")
     for loc in top_loci:
         s = locus_stats[loc]
-        summary_lines.append(
-            f"  {loc:<45} {s['total_umi']:>10} {s['cells_detected']:>12} {s['detection_rate']*100:>11.2f}%"
-        )
-    echo_summary = "\n".join(summary_lines) + "\n"
-    print(echo_summary)
+        line_txt = f"  {loc:<45} {s['total_umi']:>10} {s['cells_detected']:>12} {s['detection_rate']*100:>11.2f}%"
+        summary_lines.append(line_txt)
+        print(line_txt)
 
+    #
+    summary_lines.extend([
+        "",
+        f"[Locus-level statistics] All loci (sorted by total UMI, descending)",
+        f"  {'locus':<45} {'Total_UMI':>10} {'Detected_Cells':>12} {'Detection_Rate(%)':>12}",
+        f"  {'-'*45} {'-'*10} {'-'*12} {'-'*12}",
+    ])
     for loc in sorted_loci:
         s = locus_stats[loc]
         summary_lines.append(
             f"  {loc:<45} {s['total_umi']:>10} {s['cells_detected']:>12} {s['detection_rate']*100:>11.2f}%"
         )
+
     summary = "\n".join(summary_lines) + "\n"
     with open(out_stat, "w") as f:
         f.write(summary)
-
-    print(f"Matrix output completed: {out_mtx}")
+    print(f"\nMatrix output completed: {out_mtx}")
     print(f"Barcode-filtered UMI table output completed: {out_filtered}")
-    print(f"Statistics summary output completed (TOP{TOP_N}): {out_stat}")
-
+    print(f"Statistics summary output completed (all loci saved): {out_stat}")
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Build circRNA locus x cell UMI expression matrix")
     parser.add_argument("--name", required=True, help="name")
     parser.add_argument("--barcode", required=True, help="Path to CeleScope filtered barcodes.tsv.gz")
     return parser.parse_args()
-
 
 if __name__ == "__main__":
     args = parse_args()

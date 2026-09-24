@@ -2,21 +2,23 @@
 # -*- coding: utf-8 -*-
 """
 Parse STARsolo chimeric junction output, match with circRNA BED and annotation file,
-generate merged circ UMI annotation table (CLI version)
+generate merged circ UMI annotation table
+No UMI deduplication here, every valid BSJ read output as one row.
 """
 import argparse
 from collections import defaultdict
-
 
 def star_parse_convert(chr1, site1, strand1, chr2, site2, strand2):
     """
     Convert STAR chimeric junction coordinates to back-spliced BED coordinates
     Return tuple (chrom, bed_start, bed_end) or None if invalid
     """
-    if chr1 != chr2 or strand1 != strand2:
+    if not site1.isdigit() or not site2.isdigit():
         return None
     s1 = int(site1)
     s2 = int(site2)
+    if chr1 != chr2 or strand1 != strand2:
+        return None
     if strand1 == "+":
         bed_start = s2
         bed_end = s1 - 1
@@ -27,21 +29,19 @@ def star_parse_convert(chr1, site1, strand1, chr2, site2, strand2):
         return None
     return (chr1, bed_start, bed_end)
 
-
 def merge_circ_annotation(name, match_window):
     chimeric = f'circexplorer2/{name}/01.chimeric/{name}_valid_Chimeric.out.junction'
     bed = f'circexplorer2/{name}/02.parse/{name}_back_spliced_junction.bed'
     anno = f'circexplorer2/{name}/03.annotate/{name}_circularRNA_known.txt'
-    out = f'circexplorer2/{name}/04.matrix/{name}_circularRNA_umi.tsv'
+    out_df = f'circexplorer2/{name}/04.matrix/{name}_df.tsv'
 
-    # Statistics counter
     stat = {
         "total_chimeric": 0,
         "valid_circ_coord": 0,
         "match_bed": 0,
         "anno_hit": 0,
         "anno_miss": 0,
-        "final_unique_mol": 0
+        "final_reads": 0
     }
 
     # 1. Read BED file: map (chr,start,end) to FUSIONJUNC_ID
@@ -67,7 +67,6 @@ def merge_circ_annotation(name, match_window):
             s_anno = int(parts[1])
             e_anno = int(parts[2])
             circ_id = parts[3]
-            # parts[14] = gene_id(ENSMUSG), parts[15] = transcript_id
             gene = parts[14]
             tx = parts[15]
             exon_info = parts[-1]
@@ -80,7 +79,7 @@ def merge_circ_annotation(name, match_window):
                 "exon_info": exon_info
             })
 
-    # 3. Annotation matching function: find nearest circRNA annotation within window
+    # 3. Annotation matching function
     def find_anno(chr_bed, s_bed, e_bed):
         if chr_bed not in anno_chr_dict:
             return None
@@ -94,8 +93,7 @@ def merge_circ_annotation(name, match_window):
         candidates.sort(key=lambda x: x[0])
         return candidates[0][1]
 
-    # 4. Read chimeric junction, convert coordinates, match annotation, deduplicate by FUSIONJUNC+CB+UMI
-    circ_umi_set = set()
+    # 4. Read chimeric junction, no UMI deduplication
     out_records = []
     with open(chimeric, "r") as f:
         for line in f:
@@ -124,53 +122,45 @@ def merge_circ_annotation(name, match_window):
                 stat["anno_miss"] += 1
                 continue
             stat["anno_hit"] += 1
-            # Filter empty gene_id
             gene_id = ann_info["gene_id"].strip()
             if gene_id == "" or gene_id == "None":
                 continue
-            # Deduplication key: FUSIONJUNC_ID + CB + UMI
-            unique_key = (fj_id, cb, umi)
-            if unique_key not in circ_umi_set:
-                circ_umi_set.add(unique_key)
-                out_records.append({
-                    "chr": c_bed,
-                    "bed_start": s_bed,
-                    "bed_end": e_bed,
-                    "FUSIONJUNC_ID": fj_id,
-                    "circRNA_id": ann_info["circRNA_id"],
-                    "CB": cb,
-                    "UMI": umi,
-                    "gene_id": gene_id,
-                    "transcript_id": ann_info["transcript_id"],
-                    "exon_info": ann_info["exon_info"]
-                })
-    stat["final_unique_mol"] = len(circ_umi_set)
+            # Save raw records without deduplication; each line represents one BSJ read
+            out_records.append({
+                "chr": c_bed,
+                "bed_start": s_bed,
+                "bed_end": e_bed,
+                "FUSIONJUNC_ID": fj_id,
+                "circRNA_id": ann_info["circRNA_id"],
+                "CB": cb,
+                "UMI": umi,
+                "gene_id": gene_id,
+                "transcript_id": ann_info["transcript_id"],
+                "exon_info": ann_info["exon_info"]
+            })
+    stat["final_reads"] = len(out_records)
 
-    # 5. Write output merged TSV
-    with open(out, "w") as fout:
+    # 5. Write output wide TSV
+    with open(out_df, "w") as fout:
         header = "chr\tbed_start\tbed_end\tFUSIONJUNC_ID\tcircRNA_id\tCB\tUMI\tgene_id\ttranscript_id\texon_info\n"
         fout.write(header)
         for rec in out_records:
             row = (f"{rec['chr']}\t{rec['bed_start']}\t{rec['bed_end']}\t{rec['FUSIONJUNC_ID']}\t{rec['circRNA_id']}\t"
                    f"{rec['CB']}\t{rec['UMI']}\t{rec['gene_id']}\t{rec['transcript_id']}\t{rec['exon_info']}\n")
             fout.write(row)
-
-    print(f"Output file: {out}")
+    print(f"Output wide table: {out_df}")
     print("===== Summary Statistics =====")
     for k, v in stat.items():
         print(f"{k}: {v}")
-    print(f"Retained unique molecular records: {len(circ_umi_set)}")
-
-
+    print(f"Total retained BSJ reads: {len(out_records)}")
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Merge STARsolo chimeric junctions with circRNA BED and annotation to produce circ_umi_anno_merged.tsv"
+        description="Merge STARsolo chimeric junctions with circRNA BED and annotation, every BSJ read as one row"
     )
     parser.add_argument("--name", required=True, help="name")
     parser.add_argument("--match_window", type=int, default=10, help="Tolerance window (bp) for coordinate matching, default=10")
     return parser.parse_args()
-
 
 if __name__ == "__main__":
     args = parse_args()
